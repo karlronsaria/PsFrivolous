@@ -1,0 +1,20 @@
+{
+    "ActionList": {
+        "FilePattern": "/note/todo/*.md",
+        "TextColor": "Yellow",
+        "NumberColor": "DarkGray",
+        "Indent": 3,
+        "DateFormat": "yyyy_MM_dd"
+    },
+    "Prompt": {
+        "ApplicationName": "PS",
+        "TimeFormat": "HHmm",
+        "DateTimeFormat": "yyyy_MM_dd [HH:mm:ss]",
+        "Color": {
+            "Application": "White",
+            "Date": "DarkGreen",
+            "User": "Yellow",
+            "Domain": "Magenta"
+        }
+    }
+}
