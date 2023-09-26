@@ -16,11 +16,11 @@ function global:Prompt-Frivolous {
 
     $setting = $setting.Prompt
 
-    if ([String]::IsNullOrWhiteSpace($ApplicationName) {
+    if ([String]::IsNullOrWhiteSpace($ApplicationName)) {
         $ApplicationName = $setting.ApplicationName
     }
 
-    if ([String]::IsNullOrWhiteSpace($ApplicationColor) {
+    if ([String]::IsNullOrWhiteSpace($ApplicationColor)) {
         $ApplicationColor = $setting.Color.Application
     }
 
