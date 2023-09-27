@@ -1,4 +1,14 @@
-function Write-What {
+Add-Type -AssemblyName System.Speech
+$script:Voice = New-Object System.Speech.Synthesis.SpeechSynthesizer
+
+function Stop-TalkingPlease {
+    [Alias("Stop")]
+    Param()
+    $Voice.SpeakAsyncCancelAll()
+    [void] $Voice.SpeakAsync("Okay I'll stop")
+}
+
+function Write-Output {
     [CmdletBinding(
         HelpUri = 'https://go.microsoft.com/fwlink/?LinkID=113427',
         RemotingCapability = 'None'
@@ -46,8 +56,6 @@ function Write-What {
             throw
         }
 
-        $voice = New-Object -ComObject Sapi.SpVoice
-        $voice.Rate = 0
         $list = @()
     }
 
@@ -68,7 +76,7 @@ function Write-What {
             throw
         }
 
-        [void] $voice.Speak(($list -join ' '))
+        [void] $Voice.SpeakAsync(($list -join ' '))
     }
 
 <#
@@ -82,11 +90,18 @@ $script:MyError = @()
 function global:Set-PromptAnnoying {
     Set-Item Function:\prompt -Value {
         if ($error.Count -gt 0) {
-            $MyError = $error
-            $player = New-Object System.Media.SoundPlayer
-            $player.SoundLocation =
-                dir "$PsScriptRoot/../res/oh-no-our-table.wav"
-            $player.Play()
+            if ((Get-Random -Min 1 -Max 20) -eq 1) {
+                @("Oh no", "Our table", "It's broken") | foreach {
+                    [void] $Voice.SpeakAsync($_)
+		}
+	    }
+	    else {
+                $MyError = $error
+                $player = New-Object System.Media.SoundPlayer
+                $player.SoundLocation =
+                    dir "$PsScriptRoot/../res/oh-no-our-table.wav"
+                $player.Play()
+	    }
         }
 
         $error.Clear()
