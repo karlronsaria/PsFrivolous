@@ -40,7 +40,9 @@ function Write-ActionList {
 
     $setting = $setting.ActionList
 
-    dir $FilePattern -File `
+    dir $FilePattern `
+            -File `
+            -Recurse `
         | Sort-Object `
             -Property $SortBy `
             -Descending:$Descending `
@@ -67,7 +69,7 @@ function Write-EventList {
 
     $setting = $setting.ActionList
 
-    if ([String]::NullOrWhiteSpace($FilePattern)) {
+    if ([String]::IsNullOrWhiteSpace($FilePattern)) {
         $FilePattern = $setting.FilePattern
     }
 
@@ -97,7 +99,7 @@ function Write-TodoList {
 
     $setting = $setting.ActionList
 
-    if ([String]::NullOrWhiteSpace($FilePattern)) {
+    if ([String]::IsNullOrWhiteSpace($FilePattern)) {
         $FilePattern = $setting.FilePattern
     }
 
@@ -144,11 +146,16 @@ function Write-Schedule {
         }
 
         $paddingLen = $clockLen + ($numDays * $dayLen) - $Line.Length
+
+        if ($paddingLen -lt 0) {
+            $paddingLen = 0
+        }
+
         $Line = $Line + (" " * $paddingLen)
 
         $capture = [Regex]::Match( `
             $Line, `
-            "^(.{$clockLen})" + ("(.{$dayLen})" * $numDays) `
+            "^(.{$clockLen})$("(.{$dayLen})" * $numDays)" `
         )
 
         $obj.Clock = $capture.Groups[1].Value
@@ -238,11 +245,11 @@ function Write-Schedule {
 
     $setting = $setting.ActionList
 
-    if ([String]::NullOrWhiteSpace($FilePattern)) {
+    if ([String]::IsNullOrWhiteSpace($FilePattern)) {
         $FilePattern = $setting.FilePattern
     }
 
-    $dir = dir $FilePattern
+    $dir = dir $FilePattern -Recurse
 
     if (-not $dir) {
         return

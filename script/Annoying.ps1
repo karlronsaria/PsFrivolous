@@ -93,15 +93,15 @@ function global:Set-PromptAnnoying {
             if ((Get-Random -Min 1 -Max 20) -eq 1) {
                 @("Oh no", "Our table", "It's broken") | foreach {
                     [void] $Voice.SpeakAsync($_)
-		}
-	    }
-	    else {
+                }
+            }
+            else {
                 $MyError = $error
                 $player = New-Object System.Media.SoundPlayer
                 $player.SoundLocation =
                     dir "$PsScriptRoot/../res/oh-no-our-table.wav"
                 $player.Play()
-	    }
+            }
         }
 
         $error.Clear()
