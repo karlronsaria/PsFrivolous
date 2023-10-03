@@ -40,9 +40,16 @@ function Write-ActionList {
 
     $setting = $setting.ActionList
 
+    if ([String]::IsNullOrWhiteSpace($FilePattern)) {
+        $FilePattern = "*.md", "*.txt"
+    }
+
     dir $FilePattern `
             -File `
             -Recurse `
+        | foreach { `
+            $_.FullName `
+        } `
         | Sort-Object `
             -Property $SortBy `
             -Descending:$Descending `
