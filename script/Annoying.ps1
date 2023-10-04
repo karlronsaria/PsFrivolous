@@ -85,6 +85,13 @@ function Write-Output {
 #>
 }
 
+function Send-Distress {
+    $player = New-Object System.Media.SoundPlayer
+    $player.SoundLocation =
+        dir "$PsScriptRoot/../res/oh-no-our-table.wav"
+    $player.Play()
+}
+
 $script:MyError = @()
 
 function global:Set-PromptAnnoying {
@@ -96,11 +103,8 @@ function global:Set-PromptAnnoying {
                 }
             }
             else {
+                Send-Distress
                 $MyError = $error
-                $player = New-Object System.Media.SoundPlayer
-                $player.SoundLocation =
-                    dir "$PsScriptRoot/../res/oh-no-our-table.wav"
-                $player.Play()
             }
         }
 
