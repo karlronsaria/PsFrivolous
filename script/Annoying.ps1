@@ -1,3 +1,5 @@
+#Requires -Module PsQuickform
+
 Add-Type -AssemblyName System.Speech
 $script:Voice = New-Object System.Speech.Synthesis.SpeechSynthesizer
 

@@ -1,3 +1,7 @@
+# Requires
+### Modules
+- PsQuickform
+
 # Sources
 ### Sounds
 - fireball.wav
