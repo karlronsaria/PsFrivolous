@@ -13,3 +13,10 @@
 - oh-no-our-table.wav
   - various
   - search: oh no our table
+- metal-pipe.wav
+  - various
+  - YouTube
+    - title: Destruction_Metal_Pole_L_Wave_2_0_0.wav
+    - uploader: Jixaw
+    - retrieved: 2020
+

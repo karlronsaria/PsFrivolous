@@ -5,7 +5,7 @@
         "NumberColor": "DarkGray",
         "Indent": 3,
         "DateFormat": "yyyy_MM_dd",
-	"MarkdownBranchPattern": "^\\s*(\\d+\\.|-) "
+        "MarkdownBranchPattern": "^\\s*(\\d+\\.|-) "
     },
     "Prompt": {
         "ApplicationName": "PS",

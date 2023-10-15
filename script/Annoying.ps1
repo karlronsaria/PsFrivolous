@@ -35,26 +35,27 @@ function Write-Output {
         try {
             $outBuffer = $null
 
-            if ($PSBoundParameters.TryGetValue( `
-                'OutBuffer', `
-                [ref]$outBuffer `
+            if ($PSBoundParameters.TryGetValue(
+                'OutBuffer',
+                [ref]$outBuffer
             )) {
                 $PSBoundParameters['OutBuffer'] = 1
             }
 
-            $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand( `
-                'Microsoft.PowerShell.Utility\Write-Output', `
-                [System.Management.Automation.CommandTypes]::Cmdlet `
+            $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand(
+                'Microsoft.PowerShell.Utility\Write-Output',
+                [System.Management.Automation.CommandTypes]::Cmdlet
             )
 
             $scriptCmd = { & $wrappedCmd @PSBoundParameters }
 
-            $steppablePipeline = $scriptCmd.GetSteppablePipeline( `
-                $myInvocation.CommandOrigin `
+            $steppablePipeline = $scriptCmd.GetSteppablePipeline(
+                $myInvocation.CommandOrigin
             )
 
             $steppablePipeline.Begin($PSCmdlet)
-        } catch {
+        }
+        catch {
             throw
         }
 
@@ -136,24 +137,42 @@ function Remove-Item {
         ${Credential}
     )
 
-    dynamicparam
-    {
+    dynamicparam {
         try {
-            $targetCmd = $ExecutionContext.InvokeCommand.GetCommand('Microsoft.PowerShell.Management\Remove-Item', [System.Management.Automation.CommandTypes]::Cmdlet, $PSBoundParameters)
-            $dynamicParams = @($targetCmd.Parameters.GetEnumerator() | Microsoft.PowerShell.Core\Where-Object { $_.Value.IsDynamic })
-            if ($dynamicParams.Length -gt 0)
-            {
-                $paramDictionary = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
-                foreach ($param in $dynamicParams)
-                {
+            $targetCmd = $ExecutionContext.InvokeCommand.GetCommand(
+                'Microsoft.PowerShell.Management\Remove-Item',
+                [System.Management.Automation.CommandTypes]::Cmdlet,
+                $PSBoundParameters
+            )
+
+            $dynamicParams = @(
+                $targetCmd.Parameters.GetEnumerator() |
+                Microsoft.PowerShell.Core\Where-Object { $_.Value.IsDynamic }
+            )
+
+            if ($dynamicParams.Length -gt 0) {
+                $paramDictionary =
+                [Management.Automation.RuntimeDefinedParameterDictionary]::
+                new()
+
+                foreach ($param in $dynamicParams) {
                     $param = $param.Value
 
-                    if(-not $MyInvocation.MyCommand.Parameters.ContainsKey($param.Name))
-                    {
-                        $dynParam = [Management.Automation.RuntimeDefinedParameter]::new($param.Name, $param.ParameterType, $param.Attributes)
+                    if (-not $MyInvocation.MyCommand.Parameters.ContainsKey(
+                        $param.Name
+                    )) {
+                        $dynParam =
+                            [Management.Automation.RuntimeDefinedParameter]::
+                            new(
+                                $param.Name,
+                                $param.ParameterType,
+                                $param.Attributes
+                            )
+
                         $paramDictionary.Add($param.Name, $dynParam)
                     }
                 }
+
                 return $paramDictionary
             }
         } catch {
@@ -161,25 +180,36 @@ function Remove-Item {
         }
     }
 
-    begin
-    {
+    begin {
         try {
             $outBuffer = $null
-            if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$outBuffer))
-            {
+
+            if ($PSBoundParameters.TryGetValue(
+                'OutBuffer',
+                [ref]$outBuffer
+            )) {
                 $PSBoundParameters['OutBuffer'] = 1
             }
-            $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Microsoft.PowerShell.Management\Remove-Item', [System.Management.Automation.CommandTypes]::Cmdlet)
-            $scriptCmd = {& $wrappedCmd @PSBoundParameters }
-            $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
+
+            $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand(
+                'Microsoft.PowerShell.Management\Remove-Item',
+                [System.Management.Automation.CommandTypes]::Cmdlet
+            )
+
+            $scriptCmd = { & $wrappedCmd @PSBoundParameters }
+
+            $steppablePipeline = $scriptCmd.GetSteppablePipeline(
+                $myInvocation.CommandOrigin
+            )
+
             $steppablePipeline.Begin($PSCmdlet)
-        } catch {
+        }
+        catch {
             throw
         }
     }
 
-    process
-    {
+    process {
         try {
             $steppablePipeline.Process($_)
         } catch {
@@ -187,8 +217,7 @@ function Remove-Item {
         }
     }
 
-    end
-    {
+    end {
         try {
             $steppablePipeline.End()
         } catch {
@@ -248,25 +277,36 @@ function Write-Progress {
         ${SourceId}
     )
 
-    begin
-    {
+    begin {
         try {
             $outBuffer = $null
-            if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$outBuffer))
-            {
+
+            if ($PSBoundParameters.TryGetValue(
+                'OutBuffer',
+                [ref]$outBuffer
+            )) {
                 $PSBoundParameters['OutBuffer'] = 1
             }
-            $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Microsoft.PowerShell.Utility\Write-Progress', [System.Management.Automation.CommandTypes]::Cmdlet)
-            $scriptCmd = {& $wrappedCmd @PSBoundParameters }
-            $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
+
+            $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand(
+                'Microsoft.PowerShell.Utility\Write-Progress',
+                [System.Management.Automation.CommandTypes]::Cmdlet
+            )
+
+            $scriptCmd = { & $wrappedCmd @PSBoundParameters }
+
+            $steppablePipeline = $scriptCmd.GetSteppablePipeline(
+                $myInvocation.CommandOrigin
+            )
+
             $steppablePipeline.Begin($PSCmdlet)
-        } catch {
+        }
+        catch {
             throw
         }
     }
 
-    process
-    {
+    process {
         try {
             $steppablePipeline.Process($_)
         } catch {
@@ -274,8 +314,7 @@ function Write-Progress {
         }
     }
 
-    end
-    {
+    end {
         try {
             $steppablePipeline.End()
         } catch {
@@ -296,10 +335,19 @@ function Write-Progress {
 #>
 }
 
-function Send-Distress {
+function Send-RandomDistress {
     $player = New-Object System.Media.SoundPlayer
-    $player.SoundLocation =
-        dir "$PsScriptRoot/../res/oh-no-our-table.wav"
+
+    @(
+        "oh-no-our-table",
+        "metal-pipe"
+    ) |
+    Get-Random |
+    foreach {
+        $player.SoundLocation =
+            dir "$PsScriptRoot/../res/$_.wav"
+    }
+
     $player.Play()
 }
 
@@ -313,7 +361,9 @@ function global:Set-PromptAnnoying {
             if ($info.Reason -like "ParameterBinding*") {
                 Import-Module PsQuickform
 
-                @("Okay, it looks like you need help calling a commandlet properly") | foreach {
+                @("Okay, it looks like you need help calling a " +
+                  "commandlet properly") |
+                foreach {
                     [void] $Voice.SpeakAsync($_)
                 }
 
@@ -324,7 +374,8 @@ function global:Set-PromptAnnoying {
                         -Value (Invoke-QformCommand `
                             -CommandName $info.Activity)
 
-                    @("Result saved to Q Form Result") | foreach {
+                    @("Result saved to Q Form Result") |
+                    foreach {
                         [void] $Voice.SpeakAsync($_)
                     }
                 }
@@ -334,18 +385,20 @@ function global:Set-PromptAnnoying {
                         -Name 'AnnoyingError' `
                         -Value $_
 
-                    @("An error occurred. Result saved to Annoying Error") | foreach {
+                    @("An error occurred. Result saved to Annoying Error") |
+                    foreach {
                         [void] $Voice.SpeakAsync($_)
                     }
                 }
             }
             elseif ((Get-Random -Min 1 -Max 20) -eq 1) {
-                @("Oh no", "Our table", "It's broken") | foreach {
+                @("Oh no", "Our table", "It's broken") |
+                foreach {
                     [void] $Voice.SpeakAsync($_)
                 }
             }
             else {
-                Send-Distress
+                Send-RandomDistress
             }
 
             $MyError = $error
