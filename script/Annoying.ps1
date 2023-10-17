@@ -2,6 +2,11 @@
 
 Add-Type -AssemblyName System.Speech
 $script:Voice = New-Object System.Speech.Synthesis.SpeechSynthesizer
+$script:MyError = @()
+Set-Variable `
+    -Scope 'Script' `
+    -Name 'Annoy' `
+    -Value $true
 
 function Stop-TalkingPlease {
     [Alias("Stop")]
@@ -241,7 +246,7 @@ function Write-Progress {
         HelpUri = 'https://go.microsoft.com/fwlink/?LinkID=113428',
         RemotingCapability = 'None'
     )]
-    Param(
+    param(
         [Parameter(Mandatory = $true, Position = 0)]
         [string]
         ${Activity},
@@ -335,6 +340,176 @@ function Write-Progress {
 #>
 }
 
+function ForEach-Object {
+    [CmdletBinding(
+        DefaultParameterSetName='ScriptBlockSet',
+        SupportsShouldProcess=$true,
+        ConfirmImpact='Medium',
+        HelpUri='https://go.microsoft.com/fwlink/?LinkID=113300',
+        RemotingCapability='None'
+    )]
+    param(
+        [Parameter(
+            ParameterSetName='ScriptBlockSet',
+            ValueFromPipeline=$true
+        )]
+        [Parameter(
+            ParameterSetName='PropertyAndMethodSet',
+            ValueFromPipeline=$true
+        )]
+        [psobject]
+        ${InputObject},
+
+        [Parameter(
+            ParameterSetName='ScriptBlockSet'
+        )]
+        [scriptblock]
+        ${Begin},
+
+        [Parameter(
+            ParameterSetName='ScriptBlockSet',
+            Mandatory=$true,
+            Position=0
+        )]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [scriptblock[]]
+        ${Process},
+
+        [Parameter(
+            ParameterSetName='ScriptBlockSet'
+        )]
+        [scriptblock]
+        ${End},
+
+        [Parameter(
+            ParameterSetName='ScriptBlockSet',
+            ValueFromRemainingArguments=$true
+        )]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [scriptblock[]]
+        ${RemainingScripts},
+
+        [Parameter(
+            ParameterSetName='PropertyAndMethodSet',
+            Mandatory=$true,
+            Position=0
+        )]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${MemberName},
+
+        [Parameter(
+            ParameterSetName='PropertyAndMethodSet',
+            ValueFromRemainingArguments=$true
+        )]
+        [Alias('Args')]
+        [System.Object[]]
+        ${ArgumentList}
+    )
+
+    begin {
+        try {
+            $outBuffer = $null
+
+            if ($PSBoundParameters.TryGetValue(
+                'OutBuffer',
+                [ref]$outBuffer
+            )) {
+                $PSBoundParameters['OutBuffer'] = 1
+            }
+
+            $wrappedCmd = $ExecutionContext.
+                InvokeCommand.
+                GetCommand(
+                    'Microsoft.PowerShell.Core\ForEach-Object',
+                    [System.Management.Automation.CommandTypes]::Cmdlet
+                )
+
+            $scriptCmd = { & $wrappedCmd @PSBoundParameters }
+
+            $steppablePipeline = $scriptCmd.
+                GetSteppablePipeline($myInvocation.CommandOrigin)
+
+            $steppablePipeline.Begin($PSCmdlet)
+        } catch {
+            throw
+        }
+
+        $list = @()
+    }
+
+    process {
+        try {
+            $steppablePipeline.Process($_)
+        } catch {
+            # throw
+            $list += @([System.Management.Automation.ErrorRecord](
+                $_.PsObject.Copy()
+            ))
+        }
+    }
+
+    end {
+        $player = New-Object System.Media.SoundPlayer
+
+        Set-Variable `
+            -Scope 'Script' `
+            -Name 'Annoy' `
+            -Value $false
+
+        $max_blasts = 4
+
+        if ($list.Count -gt 1) {
+            Write-Host "Oh no."
+            $player.SoundLocation =
+                dir "$PsScriptRoot/../res/just-works.wav"
+            $player.PlaySync()
+        }
+
+        for ($i = 0; $i -lt ($list.Count - 1) -and $i -lt $max_blasts; ++$i) {
+            Write-Error $list[$i]
+            $player.SoundLocation =
+                dir "$PsScriptRoot/../res/shotgun-reload.wav"
+            $player.PlaySync()
+        }
+
+        if ($i -lt ($list.Count - 1)) {
+            Write-Error $list[$i]
+            $player.SoundLocation =
+                dir "$PsScriptRoot/../res/shotgun-staccato.wav"
+            $player.Play()
+            # Start-Sleep -Milliseconds 800
+            ++$i
+
+            for (; $i -lt ($list.Count); ++$i) {
+                Write-Error $list[$i]
+            }
+        }
+        elseif ($i -lt $list.Count) {
+            Write-Error $list[$i]
+            $player.SoundLocation =
+                dir "$PsScriptRoot/../res/shotgun-blast.wav"
+            $player.PlaySync()
+        }
+
+        try {
+            $steppablePipeline.End()
+        } catch {
+            # throw
+        }
+
+        $MyError = $error
+        $error = @()
+    }
+
+<#
+.ForwardHelpTargetName Microsoft.PowerShell.Core\ForEach-Object
+.ForwardHelpCategory Cmdlet
+#>
+}
+
 function Send-RandomDistress {
     $player = New-Object System.Media.SoundPlayer
 
@@ -351,11 +526,11 @@ function Send-RandomDistress {
     $player.Play()
 }
 
-$script:MyError = @()
-
 function global:Set-PromptAnnoying {
     Set-Item Function:\prompt -Value {
-        if ($error.Count -gt 0) {
+        $annoy = (Get-Variable -Scope 'Script' -Name 'Annoy').Value
+
+        if ($annoy -and $error.Count -gt 0) {
             $info = $error.CategoryInfo
 
             if ($info.Reason -like "ParameterBinding*") {
@@ -401,8 +576,18 @@ function global:Set-PromptAnnoying {
                 Send-RandomDistress
             }
 
+            Set-Variable `
+                -Scope 'Script' `
+                -Name 'Annoy' `
+                -Value $true
+
             $MyError = $error
         }
+
+        Set-Variable `
+            -Scope 'Script' `
+            -Name 'Annoy' `
+            -Value $true
 
         $error.Clear()
         Prompt-Frivolous -Name "PSHell" -Color "Red"
