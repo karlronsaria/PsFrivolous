@@ -2,7 +2,9 @@
 
 Add-Type -AssemblyName System.Speech
 $script:Voice = New-Object System.Speech.Synthesis.SpeechSynthesizer
+$script:AnnoyingPlayer = New-Object System.Media.SoundPlayer
 $script:MyError = @()
+
 Set-Variable `
     -Scope 'Script' `
     -Name 'Annoy' `
@@ -437,6 +439,9 @@ function ForEach-Object {
             throw
         }
 
+        $script:AnnoyingPlayer.SoundLocation =
+            dir "$PsScriptRoot/../res/looping-steps.wav"
+        $script:AnnoyingPlayer.PlayLooping()
         $list = @()
     }
 
@@ -452,7 +457,7 @@ function ForEach-Object {
     }
 
     end {
-        $player = New-Object System.Media.SoundPlayer
+        $script:AnnoyingPlayer.Stop()
 
         Set-Variable `
             -Scope 'Script' `
@@ -528,6 +533,7 @@ function Send-RandomDistress {
 
 function global:Set-PromptAnnoying {
     Set-Item Function:\prompt -Value {
+        $script:AnnoyingPlayer.Stop()
         $annoy = (Get-Variable -Scope 'Script' -Name 'Annoy').Value
 
         if ($annoy -and $error.Count -gt 0) {
