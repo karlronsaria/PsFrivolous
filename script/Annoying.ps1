@@ -4,6 +4,12 @@ Add-Type -AssemblyName System.Speech
 $script:Voice = New-Object System.Speech.Synthesis.SpeechSynthesizer
 $script:AnnoyingPlayer = New-Object System.Media.SoundPlayer
 $script:MyError = @()
+$script:ProgressIds = @()
+$script:IsPlaying = $true
+
+[System.Console]::add_CancelKeyPress({
+    $script:AnnoyingPlayer.Stop()
+})
 
 Set-Variable `
     -Scope 'Script' `
@@ -311,6 +317,19 @@ function Write-Progress {
         catch {
             throw
         }
+
+        $myId = if ($null -eq $Id) { -1 } else { $ID }
+
+        if ($myId -notIn $script:ProgressIds) {
+            $script:ProgressIds += @($myId)
+        }
+
+        if (-not $script:IsPlaying) {
+            $script:AnnoyingPlayer.SoundLocation =
+                dir "$PsScriptRoot/../res/progress/*.wav" | Get-Random
+
+            $script:IsPlaying = $true
+        }
     }
 
     process {
@@ -329,10 +348,18 @@ function Write-Progress {
         }
 
         if ($Completed -or $PercentComplete -ge 100) {
-            $player = New-Object System.Media.SoundPlayer
-            $player.SoundLocation =
-                dir "$PsScriptRoot/../res/upgrade-complete.wav"
-            $player.Play()
+            $script:ProgressIds = @($script:ProgressIds | where {
+                $_ -ne $myId
+            })
+
+            if (@($script:ProgressIds).Count -eq 0) {
+                $script:AnnoyingPlayer.Stop()
+
+                $script:AnnoyingPlayer.SoundLocation =
+                    dir "$PsScriptRoot/../res/upgrade-complete.wav"
+
+                $script:AnnoyingPlayer.Play()
+            }
         }
     }
 
@@ -344,34 +371,34 @@ function Write-Progress {
 
 function ForEach-Object {
     [CmdletBinding(
-        DefaultParameterSetName='ScriptBlockSet',
-        SupportsShouldProcess=$true,
-        ConfirmImpact='Medium',
-        HelpUri='https://go.microsoft.com/fwlink/?LinkID=113300',
-        RemotingCapability='None'
+        DefaultParameterSetName = 'ScriptBlockSet',
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Medium',
+        HelpUri = 'https://go.microsoft.com/fwlink/?LinkID=113300',
+        RemotingCapability = 'None'
     )]
     param(
         [Parameter(
-            ParameterSetName='ScriptBlockSet',
-            ValueFromPipeline=$true
+            ParameterSetName = 'ScriptBlockSet',
+            ValueFromPipeline = $true
         )]
         [Parameter(
-            ParameterSetName='PropertyAndMethodSet',
-            ValueFromPipeline=$true
+            ParameterSetName = 'PropertyAndMethodSet',
+            ValueFromPipeline = $true
         )]
         [psobject]
         ${InputObject},
 
         [Parameter(
-            ParameterSetName='ScriptBlockSet'
+            ParameterSetName = 'ScriptBlockSet'
         )]
         [scriptblock]
         ${Begin},
 
         [Parameter(
-            ParameterSetName='ScriptBlockSet',
-            Mandatory=$true,
-            Position=0
+            ParameterSetName = 'ScriptBlockSet',
+            Mandatory = $true,
+            Position = 0
         )]
         [AllowNull()]
         [AllowEmptyCollection()]
@@ -379,14 +406,14 @@ function ForEach-Object {
         ${Process},
 
         [Parameter(
-            ParameterSetName='ScriptBlockSet'
+            ParameterSetName = 'ScriptBlockSet'
         )]
         [scriptblock]
         ${End},
 
         [Parameter(
-            ParameterSetName='ScriptBlockSet',
-            ValueFromRemainingArguments=$true
+            ParameterSetName = 'ScriptBlockSet',
+            ValueFromRemainingArguments = $true
         )]
         [AllowNull()]
         [AllowEmptyCollection()]
@@ -394,17 +421,17 @@ function ForEach-Object {
         ${RemainingScripts},
 
         [Parameter(
-            ParameterSetName='PropertyAndMethodSet',
-            Mandatory=$true,
-            Position=0
+            ParameterSetName = 'PropertyAndMethodSet',
+            Mandatory = $true,
+            Position = 0
         )]
         [ValidateNotNullOrEmpty()]
         [string]
         ${MemberName},
 
         [Parameter(
-            ParameterSetName='PropertyAndMethodSet',
-            ValueFromRemainingArguments=$true
+            ParameterSetName = 'PropertyAndMethodSet',
+            ValueFromRemainingArguments = $true
         )]
         [Alias('Args')]
         [System.Object[]]
@@ -440,8 +467,10 @@ function ForEach-Object {
         }
 
         $script:AnnoyingPlayer.SoundLocation =
-            dir "$PsScriptRoot/../res/looping-steps.wav"
+            dir "$PsScriptRoot/../res/progress/*.wav" | Get-Random
+
         $script:AnnoyingPlayer.PlayLooping()
+        $script:IsPlaying = $true
         $list = @()
     }
 
@@ -468,23 +497,23 @@ function ForEach-Object {
 
         if ($list.Count -gt 1) {
             Write-Host "Oh no."
-            $player.SoundLocation =
+            $script:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/just-works.wav"
-            $player.PlaySync()
+            $script:AnnoyingPlayer.PlaySync()
         }
 
         for ($i = 0; $i -lt ($list.Count - 1) -and $i -lt $max_blasts; ++$i) {
             Write-Error $list[$i]
-            $player.SoundLocation =
+            $script:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/shotgun-reload.wav"
-            $player.PlaySync()
+            $script:AnnoyingPlayer.PlaySync()
         }
 
         if ($i -lt ($list.Count - 1)) {
             Write-Error $list[$i]
-            $player.SoundLocation =
+            $script:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/shotgun-staccato.wav"
-            $player.Play()
+            $script:AnnoyingPlayer.Play()
             # Start-Sleep -Milliseconds 800
             ++$i
 
@@ -494,9 +523,9 @@ function ForEach-Object {
         }
         elseif ($i -lt $list.Count) {
             Write-Error $list[$i]
-            $player.SoundLocation =
+            $script:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/shotgun-blast.wav"
-            $player.PlaySync()
+            $script:AnnoyingPlayer.PlaySync()
         }
 
         try {
@@ -533,7 +562,11 @@ function Send-RandomDistress {
 
 function global:Set-PromptAnnoying {
     Set-Item Function:\prompt -Value {
-        $script:AnnoyingPlayer.Stop()
+        if (-not $script:IsPlaying) {
+            $script:AnnoyingPlayer.Stop()
+        }
+
+        $script:IsPlaying = $false
         $annoy = (Get-Variable -Scope 'Script' -Name 'Annoy').Value
 
         if ($annoy -and $error.Count -gt 0) {
