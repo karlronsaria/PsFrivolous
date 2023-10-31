@@ -13,7 +13,7 @@ function Get-BoxDrawnText {
         $Message,
 
         [String]
-        $CharacterMapPath = "$PsScriptRoot\res\boxDrawnText.json"
+        $CharacterMapPath = "$PsScriptRoot\..\res\boxDrawnText.json"
     )
 
     Begin {
