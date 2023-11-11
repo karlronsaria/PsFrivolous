@@ -1,14 +1,18 @@
-# Requires
-### Modules
+# PsFrivolous
+
+## Requires
+
 - PsQuickform
 
-# Sources
+## Sources
+
 ### Sounds
+
 - fireball.wav
   - YouTube
     - title: Battle sfx [fire ball]
     - uploader: GAS
-  - url: https://www.youtube.com/watch?v=7h2dRFBfHvo
+  - url: <https://www.youtube.com/watch?v=7h2dRFBfHvo>
   - retrieved: 2023_10_08
 - oh-no-our-table.wav
   - various
@@ -26,12 +30,15 @@
   - YouTube
     - title: Shotgun Sound Effects
     - uploader: SoundMaster
-  - url: https://www.youtube.com/watch?v=AGVz9zoWNrQ
+  - url: <https://www.youtube.com/watch?v=AGVz9zoWNrQ>
   - retrieved: 2023_10_18
 - burning-intro.wav
   - YouTube
     - title: Burning Fire with sound effects free to use | no copyright
     - uploader: Abdullah Nazim
-  - url: https://www.youtube.com/watch?v=GdwhlKKw0Lc
+  - url: <https://www.youtube.com/watch?v=GdwhlKKw0Lc>
   - retrieved: 2023_10_18
 
+---
+
+[Issues Page](./doc/issue.md)
