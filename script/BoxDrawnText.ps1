@@ -6,14 +6,25 @@ Use 'Set-Clipboard' when you want to copy the output to the clipboard.
 System32\clip.exe does not accept box-drawing characters.
 #>
 function Get-BoxDrawnText {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "ByName")]
     Param(
         [Parameter(ValueFromPipeline = $true)]
         [String[]]
         $Message,
 
+        [Parameter(ParameterSetName = "ByName")]
+        [ArgumentCompleter({
+            return dir "$PsScriptRoot/../res/fontmap/*.json" |
+                foreach {
+                    $_.BaseName
+                }
+        })]
         [String]
-        $CharacterMapPath = "$PsScriptRoot\..\res\boxDrawnText.json"
+        $FontMap = "Box",
+
+        [Parameter(ParameterSetName = "ByPath")]
+        [String]
+        $FontPath = "$PsScriptRoot\..\res\fontmap\Box.json"
     )
 
     Begin {
@@ -41,7 +52,17 @@ function Get-BoxDrawnText {
             return $out
         }
 
-        $map = cat $CharacterMapPath | ConvertFrom-Json
+        $FontPath = switch ($PsCmdlet.ParameterSetName) {
+            "ByName" {
+                "$PsScriptRoot/../res/fontmap/$FontMap.json"
+            }
+
+            "ByPath" {
+                $FontPath
+            }
+        }
+
+        $map = cat $FontPath | ConvertFrom-Json
     }
 
     Process {
