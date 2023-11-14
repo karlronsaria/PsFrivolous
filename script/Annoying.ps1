@@ -5,7 +5,7 @@ $script:Voice = New-Object System.Speech.Synthesis.SpeechSynthesizer
 $script:AnnoyingPlayer = New-Object System.Media.SoundPlayer
 $script:MyError = @()
 $script:ProgressIds = @()
-$script:IsPlaying = $true
+$script:DoNotInterrupt = $true
 
 [System.Console]::add_CancelKeyPress({
     $script:AnnoyingPlayer.Stop()
@@ -20,7 +20,21 @@ function Stop-TalkingPlease {
     [Alias("Stop")]
     Param()
     $Voice.SpeakAsyncCancelAll()
+    Stop-AnnoyingPlayer -Force
     [void] $Voice.SpeakAsync("Okay I'll stop")
+}
+
+function Stop-AnnoyingPlayer {
+    Param(
+        [Switch]
+        $Force
+    )
+
+    if (-not $Force -and $script:DoNotInterrupt) {
+        return
+    }
+
+    $script:AnnoyingPlayer.Stop()
 }
 
 function Write-Output {
@@ -324,12 +338,12 @@ function Write-Progress {
             $script:ProgressIds += @($myId)
         }
 
-        if (-not $script:IsPlaying) {
+        if (-not $script:DoNotInterrupt) {
             $script:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/progress/*.wav" |
                 Get-Random
 
-            $script:IsPlaying = $true
+            $script:DoNotInterrupt = $true
         }
     }
 
@@ -368,6 +382,60 @@ function Write-Progress {
 .ForwardHelpTargetName Microsoft.PowerShell.Utility\Write-Progress
 .ForwardHelpCategory Cmdlet
 #>
+}
+
+function Send-RandomDistress {
+    $player = New-Object System.Media.SoundPlayer
+
+    $player.SoundLocation =
+        dir "$PsScriptRoot/../res/distress/*.wav" |
+        Get-Random
+
+    $player.Play()
+}
+
+function Send-HurryUp {
+    Param(
+        [Int]
+        $Interval
+    )
+
+    $timer = New-Object System.Timers.Timer
+    $timer.Interval = $Interval
+    $timer.Enabled = $true
+    $timer.AutoReset = $false
+
+    Register-ObjectEvent `
+        -InputObject $timer `
+        -EventName 'Elapsed' `
+        -Action {
+            $script:DoNotInterrupt = $true
+            $script:AnnoyingPlayer = New-Object System.Media.SoundPlayer
+            $script:AnnoyingPlayer.SoundLocation =
+                dir "$PsScriptRoot/../res/hurry-up.wav"
+            $script:AnnoyingPlayer.Play()
+        }
+
+    Register-ObjectEvent `
+        -InputObject $timer `
+        -EventName 'Elapsed' `
+        -Action {
+            $pos = $host.UI.RawUI.CursorPosition
+            $pos2 = $pos
+            $pos2.x = 0
+            $pos2.y = 0
+            $host.UI.RawUI.CursorPosition = $pos2
+
+            (Get-BoxDrawnText -Message "HURRY UP!") -split "`n" |
+                foreach {
+                    $_ | Write-Host
+                    Start-Sleep -Milliseconds 40
+                }
+
+            $host.UI.RawUI.CursorPosition = $pos
+        }
+
+    return @($timer.Start())
 }
 
 function ForEach-Object {
@@ -467,13 +535,13 @@ function ForEach-Object {
             throw
         }
 
-        $script:AnnoyingPlayer.SoundLocation =
-            dir "$PsScriptRoot/../res/progress/*.wav" |
-            Get-Random
+        # $script:AnnoyingPlayer.SoundLocation =
+        #     dir "$PsScriptRoot/../res/progress/*.wav" |
+        #     Get-Random
 
-        $script:AnnoyingPlayer.PlayLooping()
-        $script:IsPlaying = $true
-        $list = @()
+        # $script:AnnoyingPlayer.PlayLooping()
+        # $script:DoNotInterrupt = $true
+        # $list = @()
     }
 
     process {
@@ -488,8 +556,6 @@ function ForEach-Object {
     }
 
     end {
-        $script:AnnoyingPlayer.Stop()
-
         Set-Variable `
             -Scope 'Script' `
             -Name 'Annoy' `
@@ -499,6 +565,7 @@ function ForEach-Object {
 
         if ($list.Count -gt 1) {
             Write-Host "Oh no."
+            $script:AnnoyingPlayer.Stop()
             $script:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/just-works.wav"
             $script:AnnoyingPlayer.PlaySync()
@@ -546,67 +613,9 @@ function ForEach-Object {
 #>
 }
 
-function Send-RandomDistress {
-    $player = New-Object System.Media.SoundPlayer
-
-    $player.SoundLocation =
-        dir "$PsScriptRoot/../res/distress/*.wav" |
-        Get-Random
-
-    $player.Play()
-}
-
-function Send-HurryUp {
-    Param(
-        [Int]
-        $Interval
-    )
-
-    $timer = New-Object System.Timers.Timer
-    $timer.Interval = $Interval
-    $timer.Enabled = $true
-    $timer.AutoReset = $false
-
-    Register-ObjectEvent `
-        -InputObject $timer `
-        -EventName 'Elapsed' `
-        -Action {
-            $script:IsPlaying = $true
-            $script:AnnoyingPlayer = New-Object System.Media.SoundPlayer
-            $script:AnnoyingPlayer.SoundLocation =
-                dir "$PsScriptRoot/../res/hurry-up.wav"
-            $script:AnnoyingPlayer.Play()
-        }
-
-    Register-ObjectEvent `
-        -InputObject $timer `
-        -EventName 'Elapsed' `
-        -Action {
-            $pos = $host.UI.RawUI.CursorPosition
-            $pos2 = $pos
-            $pos2.x = 0
-            $pos2.y = 0
-            $host.UI.RawUI.CursorPosition = $pos2
-
-            (Get-BoxDrawnText -Message "HURRY UP!") -split "`n" |
-                foreach {
-                    $_ | Write-Host
-                    Start-Sleep -Milliseconds 40
-                }
-
-            $host.UI.RawUI.CursorPosition = $pos
-        }
-
-    return @($timer.Start())
-}
-
 function global:Set-PromptAnnoying {
     Set-Item Function:\prompt -Value {
-        if (-not $script:IsPlaying) {
-            $script:AnnoyingPlayer.Stop()
-        }
-
-        $script:IsPlaying = $false
+        Stop-AnnoyingPlayer
         $annoy = (Get-Variable -Scope 'Script' -Name 'Annoy').Value
 
         if ($annoy -and $error.Count -gt 0) {

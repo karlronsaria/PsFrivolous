@@ -17,5 +17,8 @@
             "User": "Yellow",
             "Domain": "Magenta"
         }
+    },
+    "Text": {
+        "DefaultFontMap": "AnsiShadow"
     }
 }

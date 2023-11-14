@@ -20,7 +20,10 @@ function Get-BoxDrawnText {
                 }
         })]
         [String]
-        $FontMap = "AnsiShadow",
+        $FontMap = (cat "$PsScriptRoot/../res/setting.json" |
+            ConvertFrom-Json).
+            Text.
+            DefaultFontMap,
 
         [Parameter(ParameterSetName = "ByPath")]
         [String]

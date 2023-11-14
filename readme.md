@@ -42,3 +42,5 @@
 ---
 
 [Issues Page](./doc/issue.md)
+[Progress Page](./doc/wish.md)
+
