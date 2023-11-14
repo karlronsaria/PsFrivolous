@@ -326,7 +326,8 @@ function Write-Progress {
 
         if (-not $script:IsPlaying) {
             $script:AnnoyingPlayer.SoundLocation =
-                dir "$PsScriptRoot/../res/progress/*.wav" | Get-Random
+                dir "$PsScriptRoot/../res/progress/*.wav" |
+                Get-Random
 
             $script:IsPlaying = $true
         }
@@ -467,7 +468,8 @@ function ForEach-Object {
         }
 
         $script:AnnoyingPlayer.SoundLocation =
-            dir "$PsScriptRoot/../res/progress/*.wav" | Get-Random
+            dir "$PsScriptRoot/../res/progress/*.wav" |
+            Get-Random
 
         $script:AnnoyingPlayer.PlayLooping()
         $script:IsPlaying = $true
@@ -547,17 +549,55 @@ function ForEach-Object {
 function Send-RandomDistress {
     $player = New-Object System.Media.SoundPlayer
 
-    @(
-        "oh-no-our-table",
-        "metal-pipe"
-    ) |
-    Get-Random |
-    foreach {
-        $player.SoundLocation =
-            dir "$PsScriptRoot/../res/$_.wav"
-    }
+    $player.SoundLocation =
+        dir "$PsScriptRoot/../res/distress/*.wav" |
+        Get-Random
 
     $player.Play()
+}
+
+function Send-HurryUp {
+    Param(
+        [Int]
+        $Interval
+    )
+
+    $timer = New-Object System.Timers.Timer
+    $timer.Interval = $Interval
+    $timer.Enabled = $true
+    $timer.AutoReset = $false
+
+    Register-ObjectEvent `
+        -InputObject $timer `
+        -EventName 'Elapsed' `
+        -Action {
+            $script:IsPlaying = $true
+            $script:AnnoyingPlayer = New-Object System.Media.SoundPlayer
+            $script:AnnoyingPlayer.SoundLocation =
+                dir "$PsScriptRoot/../res/hurry-up.wav"
+            $script:AnnoyingPlayer.Play()
+        }
+
+    Register-ObjectEvent `
+        -InputObject $timer `
+        -EventName 'Elapsed' `
+        -Action {
+            $pos = $host.UI.RawUI.CursorPosition
+            $pos2 = $pos
+            $pos2.x = 0
+            $pos2.y = 0
+            $host.UI.RawUI.CursorPosition = $pos2
+
+            (Get-BoxDrawnText -Message "HURRY UP!") -split "`n" |
+                foreach {
+                    $_ | Write-Host
+                    Start-Sleep -Milliseconds 40
+                }
+
+            $host.UI.RawUI.CursorPosition = $pos
+        }
+
+    return @($timer.Start())
 }
 
 function global:Set-PromptAnnoying {
@@ -582,11 +622,17 @@ function global:Set-PromptAnnoying {
                 }
 
                 try {
+                    $timer = Send-HurryUp -Interval (15 * 1000)
+
                     Set-Variable `
                         -Scope 'Global' `
                         -Name 'QformResult' `
                         -Value (Invoke-QformCommand `
                             -CommandName $info.Activity)
+
+                    foreach ($event in $timer) {
+                        Unregister-Event -SourceIdentifier $_.Name
+                    }
 
                     @("Result saved to Q Form Result") |
                     foreach {
@@ -631,5 +677,78 @@ function global:Set-PromptAnnoying {
         $error.Clear()
         Prompt-Frivolous -Name "PSHell" -Color "Red"
     }
+}
+
+function Read-Host {
+    [CmdletBinding(DefaultParameterSetName='AsString', HelpUri='https://go.microsoft.com/fwlink/?LinkID=2096610')]
+    param(
+        [Parameter(Position=0, ValueFromRemainingArguments=$true)]
+        [AllowNull()]
+        [System.Object]
+        ${Prompt},
+
+        [Parameter(ParameterSetName='AsSecureString')]
+        [switch]
+        ${AsSecureString},
+
+        [Parameter(ParameterSetName='AsString')]
+        [switch]
+        ${MaskInput}
+    )
+
+    begin
+    {
+        $timerEvents = Send-HurryUp -Interval (15 * 1000)
+
+        try {
+            $outBuffer = $null
+            if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$outBuffer))
+            {
+                $PSBoundParameters['OutBuffer'] = 1
+            }
+
+            $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Microsoft.PowerShell.Utility\Read-Host', [System.Management.Automation.CommandTypes]::Cmdlet)
+            $scriptCmd = {& $wrappedCmd @PSBoundParameters }
+
+            $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
+            $steppablePipeline.Begin($PSCmdlet)
+        } catch {
+            throw
+        }
+    }
+
+    process
+    {
+        try {
+            $steppablePipeline.Process($_)
+        } catch {
+            throw
+        }
+    }
+
+    end
+    {
+        try {
+            $steppablePipeline.End()
+        } catch {
+            throw
+        }
+
+        foreach ($event in $timerEvents) {
+            Unregister-Event -SourceIdentifier $event.Name
+        }
+    }
+
+    clean
+    {
+        if ($null -ne $steppablePipeline) {
+            $steppablePipeline.Clean()
+        }
+    }
+
+<#
+.ForwardHelpTargetName Microsoft.PowerShell.Utility\Read-Host
+.ForwardHelpCategory Cmdlet
+#>
 }
 

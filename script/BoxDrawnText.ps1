@@ -20,11 +20,14 @@ function Get-BoxDrawnText {
                 }
         })]
         [String]
-        $FontMap = "Box",
+        $FontMap = "AnsiShadow",
 
         [Parameter(ParameterSetName = "ByPath")]
         [String]
-        $FontPath = "$PsScriptRoot\..\res\fontmap\Box.json"
+        $FontPath = "$PsScriptRoot\..\res\fontmap\AnsiShadow.json",
+
+        [Switch]
+        $BoxAround
     )
 
     Begin {
@@ -34,19 +37,49 @@ function Get-BoxDrawnText {
                 $CharacterMap,
 
                 [String]
-                $InputString
+                $InputString,
+
+                [Switch]
+                $BoxAround
             )
 
             $out = ""
             $index = 0
+            $props = $CharacterMap.PsObject.Properties
 
             while ($index -lt $CharacterMap.CharacterLines) {
+                $line = ""
+
                 foreach ($c in $InputString.GetEnumerator()) {
-                    $out += ($CharacterMap.$c)[$index]
+                    $line += if ($c -match "(?-i)[A-Z]") {
+                        if ($props.Name -contains "+$c") {
+                            ($CharacterMap."+$c")[$index]
+                        }
+                        else {
+                            ($CharacterMap.$c)[$index]
+                        }
+                    }
+                    else {
+                        ($CharacterMap.$c)[$index]
+                    }
                 }
 
-                $out += "`r`n"
+                if ($BoxAround -and $out.Length -eq 0) {
+                    $out += "┌" + ("─" * ($line.Length)) + "┐`n"
+                }
+
+                $out += if ($BoxAround) {
+                    "|$line|`n"
+                }
+                else {
+                    "$line`n"
+                }
+
                 $index = $index + 1
+            }
+
+            if ($BoxAround) {
+                $out += "└" + ("─" * ($line.Length)) + "┘`n"
             }
 
             return $out
@@ -66,12 +99,13 @@ function Get-BoxDrawnText {
     }
 
     Process {
-        foreach ($submessage in $Message) {
+        foreach ($item in $Message) {
             Get-Message `
-                -InputString $submessage `
-                -CharacterMap $map
+                -InputString $item `
+                -CharacterMap $map `
+                -BoxAround:$BoxAround
 
-            Write-Output "`r`n"
+            "`r`n"
         }
     }
 }
