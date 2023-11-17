@@ -343,6 +343,7 @@ function Write-Progress {
                 dir "$PsScriptRoot/../res/progress/*.wav" |
                 Get-Random
 
+            $script:AnnoyingPlayer.Play()
             $script:DoNotInterrupt = $true
         }
     }
@@ -541,7 +542,8 @@ function ForEach-Object {
 
         # $script:AnnoyingPlayer.PlayLooping()
         # $script:DoNotInterrupt = $true
-        # $list = @()
+
+        $list = @()
     }
 
     process {
@@ -616,6 +618,12 @@ function ForEach-Object {
 function global:Set-PromptAnnoying {
     Set-Item Function:\prompt -Value {
         Stop-AnnoyingPlayer
+
+        Set-Variable `
+            -Scope 'Script' `
+            -Name 'DoNotInterrupt' `
+            -Value $false
+
         $annoy = (Get-Variable -Scope 'Script' -Name 'Annoy').Value
 
         if ($annoy -and $error.Count -gt 0) {

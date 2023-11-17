@@ -40,7 +40,6 @@
   - retrieved: 2023_10_18
 
 ---
-
 [Issues Page](./doc/issue.md)
-[Progress Page](./doc/wish.md)
+[Wishlist Page](./doc/wish.md)
 
