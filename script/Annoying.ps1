@@ -11,6 +11,17 @@ $script:DoNotInterrupt = $true
     $script:AnnoyingPlayer.Stop()
 })
 
+Register-EngineEvent `
+    -SourceIdentifier `
+        PowerShell.Exiting `
+    -Action {
+        Write-Host "😠"
+        $player = New-Object System.Media.SoundPlayer
+        $player.SoundLocation = "$PsScriptRoot/../res/off-i-go-then_-_175speed.wav"
+        $player.PlaySync()
+    } |
+    Out-Null
+
 Set-Variable `
     -Scope 'Script' `
     -Name 'Annoy' `
