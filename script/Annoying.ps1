@@ -15,7 +15,10 @@ Register-EngineEvent `
     -SourceIdentifier `
         PowerShell.Exiting `
     -Action {
-        Write-Host "😠"
+        Write-Bitmap `
+            -Path "$PsScriptRoot/../res/pic/todd-emote-color-20.png" `
+            -XScale -2
+
         $player = New-Object System.Media.SoundPlayer
         $player.SoundLocation = "$PsScriptRoot/../res/off-i-go-then_-_175speed.wav"
         $player.PlaySync()
@@ -780,3 +783,137 @@ function Read-Host {
 #>
 }
 
+function Get-Help {
+    [CmdletBinding(
+        DefaultParameterSetName = 'AllUsersView',
+        HelpUri = 'https://go.microsoft.com/fwlink/?LinkID=2096483'
+    )]
+    Param(
+        [Parameter(
+            Position = 0,
+            ValueFromPipelineByPropertyName = $true
+        )]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        ${Name},
+
+        [String]
+        ${Path},
+
+        [ValidateSet(
+            'Alias', 'Cmdlet', 'Provider', 'General', 'FAQ', 'Glossary',
+            'HelpFile', 'ScriptCommand', 'Function', 'Filter',
+            'ExternalScript', 'All', 'DefaultHelp', 'DscResource', 'Class',
+            'Configuration'
+        )]
+        [String[]]
+        ${Category},
+
+        [Parameter(
+            ParameterSetName = 'DetailedView',
+            Mandatory = $true
+        )]
+        [Switch]
+        ${Detailed},
+
+        [Parameter(
+            ParameterSetName = 'AllUsersView'
+        )]
+        [Switch]
+        ${Full},
+
+        [parameter(
+            ParameterSetName = 'Examples',
+            Mandatory = $true
+        )]
+        [Switch]
+        ${Examples},
+
+        [parameter(
+            ParameterSetName = 'Parameters',
+            Mandatory = $true
+        )]
+        [String[]]
+        ${Parameter},
+
+        [String[]]
+        ${Component},
+
+        [String[]]
+        ${Functionality},
+
+        [String[]]
+        ${Role},
+
+        [parameter(
+            ParameterSetName = 'Online',
+            Mandatory = $true
+        )]
+        [Switch]
+        ${Online},
+
+        [parameter(
+            ParameterSetName = 'ShowWindow',
+            Mandatory = $true
+        )]
+        [Switch]
+        ${ShowWindow}
+    )
+
+    Begin {
+        try {
+            Write-Host "Oh, you want help?"
+            # todo
+            toddlaugh
+
+            $outBuffer = $null
+
+            if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$outBuffer))
+            {
+                $PSBoundParameters['OutBuffer'] = 1
+            }
+
+            $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand(
+                'Microsoft.PowerShell.Core\Get-Help',
+                [System.Management.Automation.CommandTypes]::Cmdlet
+            )
+
+            $scriptCmd = { & $wrappedCmd @PSBoundParameters }
+
+            $steppablePipeline = $scriptCmd.GetSteppablePipeline(
+                $myInvocation.CommandOrigin
+            )
+
+            $steppablePipeline.Begin($PSCmdlet)
+        } catch {
+            throw
+        }
+    }
+
+    Process {
+        try {
+            $steppablePipeline.Process($_)
+        } catch {
+            throw
+        }
+    }
+
+    End {
+        try {
+            $steppablePipeline.End()
+        } catch {
+            throw
+        }
+    }
+
+    Clean {
+        if ($null -ne $steppablePipeline) {
+            $steppablePipeline.Clean()
+        }
+    }
+
+<#
+.ForwardHelpTargetName Microsoft.PowerShell.Core\Get-Help
+.ForwardHelpCategory Cmdlet
+#>
+}

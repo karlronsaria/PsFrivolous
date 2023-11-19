@@ -6,6 +6,13 @@
 
 ## Sources
 
+### Modules
+
+- natemrice/powershell-drawing
+  - used in: ``Draw.ps1#Write-Bitmap``
+  - url: <https://github.com/natemrice/powershell-drawing>
+  - retrieved: 2023_11_18
+
 ### Sounds
 
 - fireball.wav
@@ -38,8 +45,16 @@
     - uploader: Abdullah Nazim
   - url: <https://www.youtube.com/watch?v=GdwhlKKw0Lc>
   - retrieved: 2023_10_18
+- hurry-up.wav
+  - Pokémon Pinball (1999) – Map Mode
+- look-bubbles
+  - Nicki Minaj – Stupid Hoe
+- off-i-go-then\*.wav
+  - WarCraft III – Human Peasant Sound Effects
+- diablo-disc-autorun.wav
+  - Diablo (1996) Disc Auto-run
 
 ---
 [Issues Page](./doc/issue.md)
+[Progress Page](./doc/todo.md)
 [Wishlist Page](./doc/wish.md)
-

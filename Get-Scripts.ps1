@@ -11,6 +11,6 @@
     Retrieved: 2022_10_09
 #>
 
-$scripts = dir "$PsScriptRoot\script\*.ps1"
-
-return $scripts
+return `
+    @(dir "$PsScriptRoot\script\*.ps1") +
+    @(dir "$PsScriptRoot\external\*\script\*.ps1")

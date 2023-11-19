@@ -14,9 +14,19 @@ function Get-BoxDrawnText {
 
         [Parameter(ParameterSetName = "ByName")]
         [ArgumentCompleter({
+            Param(
+                $CommandName,
+                $ParameterName,
+                $WordToComplete,
+                $CommandAst,
+                $PreboundParameters
+            )
+
             return dir "$PsScriptRoot/../res/fontmap/*.json" |
                 foreach {
                     $_.BaseName
+                } | where {
+                    $_ -like "$WordToComplete*"
                 }
         })]
         [String]
