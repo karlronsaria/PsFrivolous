@@ -17,7 +17,7 @@ Register-EngineEvent `
     -Action {
         Write-Bitmap `
             -Path "$PsScriptRoot/../res/pic/todd-emote-color-20.png" `
-            -XScale -2
+            -XScale 2
 
         $player = New-Object System.Media.SoundPlayer
         $player.SoundLocation = "$PsScriptRoot/../res/off-i-go-then_-_175speed.wav"
@@ -575,7 +575,7 @@ function ForEach-Object {
         Set-Variable `
             -Scope 'Script' `
             -Name 'Annoy' `
-            -Value $false
+            -Value $true # todo
 
         $max_blasts = 4
 
@@ -662,7 +662,7 @@ function global:Set-PromptAnnoying {
                             -CommandName $info.Activity)
 
                     foreach ($event in $timer) {
-                        Unregister-Event -SourceIdentifier $_.Name
+                        Unregister-Event -SourceIdentifier $event.Name
                     }
 
                     @("Result saved to Q Form Result") |
