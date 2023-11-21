@@ -6,6 +6,7 @@ $script:AnnoyingPlayer = New-Object System.Media.SoundPlayer
 $script:MyError = @()
 $script:ProgressIds = @()
 $script:DoNotInterrupt = $true
+$script:TimeOut = 15
 
 [System.Console]::add_CancelKeyPress({
     $script:AnnoyingPlayer.Stop()
@@ -20,7 +21,8 @@ Register-EngineEvent `
             -XScale 2
 
         $player = New-Object System.Media.SoundPlayer
-        $player.SoundLocation = "$PsScriptRoot/../res/off-i-go-then_-_175speed.wav"
+        $player.SoundLocation =
+            "$PsScriptRoot/../res/off-i-go-then_-_175speed.wav"
         $player.PlaySync()
     } |
     Out-Null
@@ -318,7 +320,7 @@ function Write-Progress {
         ${SourceId}
     )
 
-    begin {
+    Begin {
         try {
             $outBuffer = $null
 
@@ -362,7 +364,7 @@ function Write-Progress {
         }
     }
 
-    process {
+    Process {
         try {
             $steppablePipeline.Process($_)
         } catch {
@@ -370,7 +372,7 @@ function Write-Progress {
         }
     }
 
-    end {
+    End {
         try {
             $steppablePipeline.End()
         } catch {
@@ -653,7 +655,8 @@ function global:Set-PromptAnnoying {
                 }
 
                 try {
-                    $timer = Send-HurryUp -Interval (15 * 1000)
+                    $timerEvents = Send-HurryUp `
+                        -Interval ($script:TimeOut * 1000)
 
                     Set-Variable `
                         -Scope 'Global' `
@@ -661,7 +664,7 @@ function global:Set-PromptAnnoying {
                         -Value (Invoke-QformCommand `
                             -CommandName $info.Activity)
 
-                    foreach ($event in $timer) {
+                    foreach ($event in $timerEvents) {
                         Unregister-Event -SourceIdentifier $event.Name
                     }
 
@@ -711,57 +714,82 @@ function global:Set-PromptAnnoying {
 }
 
 function Read-Host {
-    [CmdletBinding(DefaultParameterSetName='AsString', HelpUri='https://go.microsoft.com/fwlink/?LinkID=2096610')]
-    param(
-        [Parameter(Position=0, ValueFromRemainingArguments=$true)]
+    [CmdletBinding(
+        DefaultParameterSetName = 'AsString',
+        HelpUri = 'https://go.microsoft.com/fwlink/?LinkID=2096610'
+    )]
+    Param(
+        [Parameter(
+            Position = 0,
+            ValueFromRemainingArguments = $true
+        )]
         [AllowNull()]
         [System.Object]
         ${Prompt},
 
-        [Parameter(ParameterSetName='AsSecureString')]
-        [switch]
+        [Parameter(
+            ParameterSetName = 'AsSecureString'
+        )]
+        [Switch]
         ${AsSecureString},
 
-        [Parameter(ParameterSetName='AsString')]
-        [switch]
+        [Parameter(
+            ParameterSetName = 'AsString'
+        )]
+        [Switch]
         ${MaskInput}
     )
 
-    begin
+    Begin
     {
-        $timerEvents = Send-HurryUp -Interval (15 * 1000)
+        $timerEvents = Send-HurryUp -Interval ($script:TimeOut * 1000)
+        $script:annoy = $true
 
         try {
             $outBuffer = $null
-            if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$outBuffer))
-            {
+
+            if ($PSBoundParameters.TryGetValue(
+                'OutBuffer',
+                [ref]$outBuffer
+            )) {
                 $PSBoundParameters['OutBuffer'] = 1
             }
 
-            $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Microsoft.PowerShell.Utility\Read-Host', [System.Management.Automation.CommandTypes]::Cmdlet)
-            $scriptCmd = {& $wrappedCmd @PSBoundParameters }
+            $wrappedCmd =
+                $ExecutionContext.InvokeCommand.GetCommand(
+                    'Microsoft.PowerShell.Utility\Read-Host',
+                    [System.Management.Automation.CommandTypes]::Cmdlet
+                )
 
-            $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
+            $scriptCmd = { & $wrappedCmd @PSBoundParameters }
+
+            $steppablePipeline = $scriptCmd.GetSteppablePipeline(
+                $myInvocation.CommandOrigin
+            )
+
             $steppablePipeline.Begin($PSCmdlet)
-        } catch {
+        }
+        catch {
             throw
         }
     }
 
-    process
+    Process
     {
         try {
             $steppablePipeline.Process($_)
-        } catch {
+        }
+        catch {
             throw
         }
     }
 
-    end
+    End
     {
         try {
             $steppablePipeline.End()
-        } catch {
+        }
+        catch {
             throw
         }
 
@@ -770,7 +798,7 @@ function Read-Host {
         }
     }
 
-    clean
+    Clean
     {
         if ($null -ne $steppablePipeline) {
             $steppablePipeline.Clean()
@@ -822,14 +850,14 @@ function Get-Help {
         [Switch]
         ${Full},
 
-        [parameter(
+        [Parameter(
             ParameterSetName = 'Examples',
             Mandatory = $true
         )]
         [Switch]
         ${Examples},
 
-        [parameter(
+        [Parameter(
             ParameterSetName = 'Parameters',
             Mandatory = $true
         )]
@@ -845,14 +873,14 @@ function Get-Help {
         [String[]]
         ${Role},
 
-        [parameter(
+        [Parameter(
             ParameterSetName = 'Online',
             Mandatory = $true
         )]
         [Switch]
         ${Online},
 
-        [parameter(
+        [Parameter(
             ParameterSetName = 'ShowWindow',
             Mandatory = $true
         )]
@@ -862,14 +890,16 @@ function Get-Help {
 
     Begin {
         try {
-            Write-Host "Oh, you want help?"
+            Write-Host "Oh, you want help, do you?"
             # todo
             toddlaugh
 
             $outBuffer = $null
 
-            if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$outBuffer))
-            {
+            if ($PSBoundParameters.TryGetValue(
+                'OutBuffer',
+                [ref]$outBuffer
+            )) {
                 $PSBoundParameters['OutBuffer'] = 1
             }
 
