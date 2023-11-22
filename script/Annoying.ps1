@@ -2,14 +2,14 @@
 
 Add-Type -AssemblyName System.Speech
 $script:Voice = New-Object System.Speech.Synthesis.SpeechSynthesizer
-$script:AnnoyingPlayer = New-Object System.Media.SoundPlayer
+$global:AnnoyingPlayer = New-Object System.Media.SoundPlayer
 $script:MyError = @()
 $script:ProgressIds = @()
 $script:DoNotInterrupt = $true
 $script:TimeOut = 15
 
 [System.Console]::add_CancelKeyPress({
-    $script:AnnoyingPlayer.Stop()
+    $global:AnnoyingPlayer.Stop()
 })
 
 Register-EngineEvent `
@@ -50,7 +50,7 @@ function Stop-AnnoyingPlayer {
         return
     }
 
-    $script:AnnoyingPlayer.Stop()
+    $global:AnnoyingPlayer.Stop()
 }
 
 function Write-Output {
@@ -355,11 +355,11 @@ function Write-Progress {
         }
 
         if (-not $script:DoNotInterrupt) {
-            $script:AnnoyingPlayer.SoundLocation =
+            $global:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/progress/*.wav" |
                 Get-Random
 
-            $script:AnnoyingPlayer.Play()
+            $global:AnnoyingPlayer.Play()
             $script:DoNotInterrupt = $true
         }
     }
@@ -385,12 +385,12 @@ function Write-Progress {
             })
 
             if (@($script:ProgressIds).Count -eq 0) {
-                $script:AnnoyingPlayer.Stop()
+                $global:AnnoyingPlayer.Stop()
 
-                $script:AnnoyingPlayer.SoundLocation =
+                $global:AnnoyingPlayer.SoundLocation =
                     dir "$PsScriptRoot/../res/upgrade-complete.wav"
 
-                $script:AnnoyingPlayer.Play()
+                $global:AnnoyingPlayer.Play()
             }
         }
     }
@@ -427,10 +427,10 @@ function Send-HurryUp {
         -EventName 'Elapsed' `
         -Action {
             $script:DoNotInterrupt = $true
-            $script:AnnoyingPlayer = New-Object System.Media.SoundPlayer
-            $script:AnnoyingPlayer.SoundLocation =
+            $global:AnnoyingPlayer = New-Object System.Media.SoundPlayer
+            $global:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/hurry-up.wav"
-            $script:AnnoyingPlayer.Play()
+            $global:AnnoyingPlayer.Play()
         }
 
     Register-ObjectEvent `
@@ -583,24 +583,24 @@ function ForEach-Object {
 
         if ($list.Count -gt 1) {
             Write-Host "Oh no."
-            $script:AnnoyingPlayer.Stop()
-            $script:AnnoyingPlayer.SoundLocation =
+            $global:AnnoyingPlayer.Stop()
+            $global:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/just-works.wav"
-            $script:AnnoyingPlayer.PlaySync()
+            $global:AnnoyingPlayer.PlaySync()
         }
 
         for ($i = 0; $i -lt ($list.Count - 1) -and $i -lt $max_blasts; ++$i) {
             Write-Error $list[$i]
-            $script:AnnoyingPlayer.SoundLocation =
+            $global:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/shotgun-reload.wav"
-            $script:AnnoyingPlayer.PlaySync()
+            $global:AnnoyingPlayer.PlaySync()
         }
 
         if ($i -lt ($list.Count - 1)) {
             Write-Error $list[$i]
-            $script:AnnoyingPlayer.SoundLocation =
+            $global:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/shotgun-staccato.wav"
-            $script:AnnoyingPlayer.Play()
+            $global:AnnoyingPlayer.Play()
             # Start-Sleep -Milliseconds 800
             ++$i
 
@@ -610,9 +610,9 @@ function ForEach-Object {
         }
         elseif ($i -lt $list.Count) {
             Write-Error $list[$i]
-            $script:AnnoyingPlayer.SoundLocation =
+            $global:AnnoyingPlayer.SoundLocation =
                 dir "$PsScriptRoot/../res/shotgun-blast.wav"
-            $script:AnnoyingPlayer.PlaySync()
+            $global:AnnoyingPlayer.PlaySync()
         }
 
         try {
