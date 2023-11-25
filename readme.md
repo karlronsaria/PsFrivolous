@@ -9,7 +9,7 @@
 ### Modules
 
 - natemrice/powershell-drawing
-  - used in: [``Draw.ps1#Write-Bitmap``](./external/Draw/readme.md)
+  - used in: [``Draw.ps1#Write-Bitmap``](./doc/Draw.md)
   - url: <https://github.com/natemrice/powershell-drawing>
   - retrieved: 2023_11_18
 
