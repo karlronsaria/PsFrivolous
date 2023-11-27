@@ -6,16 +6,13 @@ Retrieved: 2023_11_21
 function Write-Color {
     [CmdletBinding(DefaultParameterSetName = "ByPixel")]
     Param(
+        [Parameter(Position = 0)]
         [String]
         $InputObject = " ",
 
         [Parameter(ParameterSetName = "ByPixel")]
         [System.Drawing.Color]
         $Pixel,
-
-        [Parameter(ParameterSetName = "ByQuadruple")]
-        [Int]
-        $Alpha,
 
         [Parameter(ParameterSetName = "ByQuadruple")]
         [Int]
@@ -29,12 +26,16 @@ function Write-Color {
         [Int]
         $Blue,
 
+        [Parameter(ParameterSetName = "ByQuadruple")]
+        [Int]
+        $Alpha = 255,
+
         [Int]
         $XScale = 1,
 
         [ValidateSet("Foreground", "Background")]
         [String]
-        $Mode = "Background",
+        $ApplyTo = "Background",
 
         [Switch]
         $NoAlpha
@@ -50,7 +51,7 @@ function Write-Color {
     $ansi_escape = [char]27
     $alpha_str = if (-not $NoAlpha) { ";{3}" }
 
-    $mode_num = switch ($Mode) {
+    $mode_num = switch ($ApplyTo) {
         "Foreground" { 38 }
         "Background" { 48 }
     }
@@ -101,11 +102,17 @@ Write-Bitmap -Url https://addons.thunderbird.net/user-media/addon_icons/347/3478
 function Write-Bitmap {
     [CmdletBinding(DefaultParameterSetName = "FromLocal")]
     Param(
-        [Parameter(ParameterSetName = "FromLocal")]
+        [Parameter(
+            ParameterSetName = "FromLocal",
+            Position = 0
+        )]
         [String]
         $Path,
 
-        [Parameter(ParameterSetName = "FromOnline")]
+        [Parameter(
+            ParameterSetName = "FromOnline",
+            Position = 0
+        )]
         [String]
         $Url,
 
@@ -173,7 +180,10 @@ giving a much more chaotic appearance.
 #>
 function Write-ColorWheel {
     Param(
-        [Parameter(ValueFromPipeline = $true)]
+        [Parameter(
+            ValueFromPipeline = $true,
+            Position = 0
+        )]
         [Object[]]
         $InputObject,
 
@@ -255,7 +265,7 @@ function Write-ColorWheel {
                                 -Red $r `
                                 -Green $g `
                                 -Blue $b `
-                                -Mode $ApplyTo `
+                                -ApplyTo $ApplyTo `
                                 -NoAlpha
                         }
                     ))
