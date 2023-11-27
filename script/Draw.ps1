@@ -63,7 +63,11 @@ function Write-Color {
 
     $ansi_terminate = "$ansi_escape[0m"
     $out = "$($ansi_command)$($InputObject)$($ansi_terminate)"
-    Write-Host -NoNewline ($out * $XScale)
+
+    # # todo
+    # Write-Host -NoNewline ($out * $XScale)
+
+    ($out * $XScale)
 }
 
 <#
@@ -143,17 +147,23 @@ function Write-Bitmap {
     }
 
     foreach ($y in (0 .. ($bitMap.Height - 1))) {
+        $line = New-Object System.Text.StringBuilder
+
         foreach ($x in $x_range) {
-            Write-Color `
-                -Pixel $bitMap.GetPixel($x, $y) `
-                -XScale $XScale `
-                -NoAlpha:$NoAlpha
+            [void] $line.Append($(
+                Write-Color `
+                    -Pixel $bitMap.GetPixel($x, $y) `
+                    -XScale $XScale `
+                    -NoAlpha:$NoAlpha
+            ))
         }
 
-        Write-Host ""
+        $line.ToString()
     }
 
     $bitMap.Dispose()
+    # # todo
+    # return $list -join ""
 }
 
 <#
@@ -221,32 +231,40 @@ function Write-ColorWheel {
                 $($list | Out-String).GetEnumerator() |
                 foreach -Begin {
                     $i = 0
+                    $line = New-Object System.Text.StringBuilder
                 } -Process {
                     $isSpace = [Char]::IsWhiteSpace($_)
 
-                    if ($isSpace) {
-                        Write-Host $_ -NoNewline
-                    }
-                    else {
-                        # Red, Green, and Blue must be equidistant on the
-                        # color wheel, so each offset should be a multiple
-                        # of (1/3)2π.
-                        $r = Get-Signal -Arg $i
-                        $g = Get-Signal -Arg $i -Offset (2.0/3)
-                        $b = Get-Signal -Arg $i -Offset (4.0/3)
+                    [void] $line.Append($(
+                        if ($_ -in "`r", "`n") {
+                            ""
+                        }
+                        elseif ($isSpace) {
+                            $_
+                        }
+                        else {
+                            # Red, Green, and Blue must be equidistant
+                            # on the color wheel, so each offset should
+                            # be a multiple of (1/3)2π.
+                            $r = Get-Signal -Arg $i
+                            $g = Get-Signal -Arg $i -Offset (2.0/3)
+                            $b = Get-Signal -Arg $i -Offset (4.0/3)
 
-                        Write-Color `
-                            -InputObject $_ `
-                            -Red $r `
-                            -Green $g `
-                            -Blue $b `
-                            -Mode $ApplyTo `
-                            -NoAlpha
-                    }
+                            Write-Color `
+                                -InputObject $_ `
+                                -Red $r `
+                                -Green $g `
+                                -Blue $b `
+                                -Mode $ApplyTo `
+                                -NoAlpha
+                        }
+                    ))
 
                     if ($Mode -ne "ByCharacter" -or -not $isSpace) {
                         $i = if ($i -eq ($Period - 1)) { 0 } else { $i + 1 }
                     }
+                } -End {
+                    $line.ToString()
                 }
             }
         }

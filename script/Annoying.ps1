@@ -18,7 +18,8 @@ Register-EngineEvent `
     -Action {
         Write-Bitmap `
             -Path "$PsScriptRoot/../res/pic/todd-emote-color-20.png" `
-            -XScale 2
+            -XScale 2 |
+        Write-Host
 
         $player = New-Object System.Media.SoundPlayer
         $player.SoundLocation =
