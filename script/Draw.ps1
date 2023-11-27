@@ -64,11 +64,7 @@ function Write-Color {
 
     $ansi_terminate = "$ansi_escape[0m"
     $out = "$($ansi_command)$($InputObject)$($ansi_terminate)"
-
-    # # todo
-    # Write-Host -NoNewline ($out * $XScale)
-
-    ($out * $XScale)
+    $out * $XScale
 }
 
 <#
@@ -169,8 +165,6 @@ function Write-Bitmap {
     }
 
     $bitMap.Dispose()
-    # # todo
-    # return $list -join ""
 }
 
 <#
@@ -238,7 +232,8 @@ function Write-ColorWheel {
             }
 
             default {
-                $($list | Out-String).GetEnumerator() |
+                $($list | Out-String).
+                GetEnumerator() |
                 foreach -Begin {
                     $i = 0
                     $line = New-Object System.Text.StringBuilder
