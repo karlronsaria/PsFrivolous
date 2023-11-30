@@ -224,7 +224,7 @@ function Write-ColorWheel {
             "ByColumn" {
                 ($list | Out-String) -Split "`n" | foreach {
                     Write-ColorWheel `
-                        -InputObject $InputObject `
+                        -InputObject $_ `
                         -Period $Period `
                         -ApplyTo $ApplyTo `
                         -Mode "ByPeriod"
@@ -232,16 +232,16 @@ function Write-ColorWheel {
             }
 
             default {
-                $($list | Out-String).
-                GetEnumerator() |
+                [System.Globalization.StringInfo]::
+                GetTextElementEnumerator(($list | Out-String)) |
                 foreach -Begin {
                     $i = 0
                     $line = New-Object System.Text.StringBuilder
                 } -Process {
-                    $isSpace = [Char]::IsWhiteSpace($_)
+                    $isSpace = [String]::IsNullOrWhiteSpace($_)
 
                     [void] $line.Append($(
-                        if ($_ -in "`r", "`n") {
+                        if ($_ -match "^\s*(`r|`n)$") {
                             ""
                         }
                         elseif ($isSpace) {

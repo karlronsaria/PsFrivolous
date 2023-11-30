@@ -2,10 +2,17 @@ Set-PsDebug -Strict
 
 & "$PsScriptRoot/Scripts/PsFrivolous/Get-Scripts.ps1" | % { . $_ }
 
+# karlr 2023_11_29
+$OutputEncoding =
+[System.Console]::InputEncoding =
+[System.Console]::OutputEncoding =
+    [System.Text.Encoding]::UTF8
+
 {
     $player = New-Object System.Media.SoundPlayer
     $player.SoundLocation =
-        dir "$PsScriptRoot/Scripts/PsFrivolous/res/intro/*.wav" | Get-Random
+        dir "$PsScriptRoot/Scripts/PsFrivolous/res/intro/*.wav" |
+        Get-Random
     $player.Play()
 }.Invoke()
 
@@ -15,6 +22,7 @@ Set-PsDebug -Strict
         2 = @("THAT'S NO", "GOOD")
         3 = @("Let me", "HELLp!")
         4 = @("You Disgust", "Me")
+        5 = @("One must", "imagine You", "happy")
     }
 
     Write-Host ""
