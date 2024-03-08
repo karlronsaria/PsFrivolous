@@ -190,7 +190,13 @@ function Write-ColorWheel {
 
         [ValidateSet("ByCharacter", "ByPeriod", "ByColumn")]
         [String]
-        $Mode = "ByColumn"
+        $Mode = "ByColumn",
+
+        [Int]
+        $Start = 0,
+
+        [Switch]
+        $NoNewline
     )
 
     Begin {
@@ -222,20 +228,25 @@ function Write-ColorWheel {
     End {
         switch ($Mode) {
             "ByColumn" {
-                ($list | Out-String) -Split "`n" | foreach {
+                ($list |
+                    Out-String -NoNewline:$NoNewline
+                ) -Split "`n" | foreach {
                     Write-ColorWheel `
                         -InputObject $_ `
                         -Period $Period `
                         -ApplyTo $ApplyTo `
-                        -Mode "ByPeriod"
+                        -Mode "ByPeriod" `
+                        -Start $Start
                 }
             }
 
             default {
                 [System.Globalization.StringInfo]::
-                GetTextElementEnumerator(($list | Out-String)) |
+                GetTextElementEnumerator((
+                    $list | Out-String -NoNewline:$NoNewline
+                )) |
                 foreach -Begin {
-                    $i = 0
+                    $i = $Start
                     $line = New-Object System.Text.StringBuilder
                 } -Process {
                     $isSpace = [String]::IsNullOrWhiteSpace($_)

@@ -7,6 +7,7 @@ function Get-LinotypeBreak {
         [Int]
         $Length = 85,
 
+        [ValidateScript({ $_ -ne 0 })]
         [Int]
         $Frequency = 20
     )
@@ -53,12 +54,14 @@ function Get-LinotypeBreak {
                                     Get-Random -Min ($i + 1) -Max ($word.Length - 1)
                                 }
 
-                            $a = $word.Substring(0, $i)  # Get-Slice -In $word -S 0 -E ($i - 1)
-                            $b = $word.Substring($i + 1, $j - $i - 1)  # Get-Slice -In $word -S ($i + 1) -E ($j - 1)
-                            $c = $word.Substring($j + 1, $word.Length - $j - 1)  # Get-Slice -In $word -S ($j + 1) -E ($word.Length - 1)
+                            if ($word[$i] -ne $word[$j]) {
+                                $a = $word.Substring(0, $i)
+                                $b = $word.Substring($i + 1, $j - $i - 1)
+                                $c = $word.Substring($j + 1, $word.Length - $j - 1)
 
-                            $mistake = "$a$($word[$j])$b$($word[$i])$c"
-                            "$line $mistake etaoin shrdlu $('m' * 40)".Substring(0, 40)
+                                $mistake = "$a$($word[$j])$b$($word[$i])$c"
+                                "$line $mistake etaoin shrdlu $('m' * $Length)".Substring(0, $Length)
+                            }
                         }
 
                         $line += if ([String]::IsNullOrEmpty($line)) {
@@ -98,7 +101,8 @@ function Get-LinotypeBreak {
             if ([String]::IsNullOrWhiteSpace($line)) {
                 Get-LineBreak `
                     -InputObject ($lines -join " ") `
-                    -Length $Length
+                    -Length $Length `
+                    -Frequency $Frequency
 
                 $line
                 $lines = @()
@@ -110,7 +114,8 @@ function Get-LinotypeBreak {
 
         Get-LineBreak `
             -InputObject ($lines -join " ") `
-            -Length $Length
+            -Length $Length `
+            -Frequency $Frequency
     }
 }
 
