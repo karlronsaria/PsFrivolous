@@ -1,0 +1,31 @@
+{
+    "MousePointerThemes": [
+        {
+            "Name": "SystemDefault",
+            "Theme": {
+                "Arrow"        : "C:/Windows/Cursors/aero_arrow.cur",
+                "Help"         : "C:/Windows/Cursors/aero_helpsel.cur",
+                "AppStarting"  : "C:/Windows/Cursors/aero_working.ani",
+                "Wait"         : "C:/Windows/Cursors/aero_busy.ani",
+                "Crosshair"    : "C:/Windows/Cursors/cross_i.cur",
+                "IBEAM"        : "C:/Windows/Cursors/beam_i.cur",
+                "NWPen"        : "C:/Windows/Cursors/pen_i.cur",
+                "No"           : "C:/Windows/Cursors/no.cur",
+                "SizeNS"       : "C:/Windows/Cursors/size_ns.cur",
+                "SizeWE"       : "C:/Windows/Cursors/size_we.cur",
+                "SizeNWSE"     : "C:/Windows/Cursors/size_nwse.cur",
+                "SizeNESW"     : "C:/Windows/Cursors/size_nesw.cur",
+                "SizeAll"      : "C:/Windows/Cursors/size_all.cur",
+                "UpArrow"      : "C:/Windows/Cursors/up_i.cur",
+                "Hand"         : "C:/Windows/Cursors/aero_link.cur"
+            }
+        },
+        {
+            "Name": "ToddMode",
+            "Theme": {
+                "Arrow" : "C:/shortcut/dos/backup/theme/toddhoward.cur"
+            }
+        }
+    ]
+}
+
