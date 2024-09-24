@@ -1,5 +1,32 @@
 <#
 .DESCRIPTION
+Tags: theme wallpaper
+#>
+function Set-Wallpaper {
+    Param(
+        [Parameter(ValueFromPipeline = $true)]
+        [String]
+        $FilePath
+    )
+
+    Add-Type -TypeDefinition @"
+using System.Runtime.InteropServices;
+public class Wallpaper {
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+}
+"@
+
+    Set-ItemProperty `
+        -Path 'HKCU:/Control Panel/Desktop' `
+        -Name wallpaper `
+        -Value $FilePath
+
+    return 1 -eq [Wallpaper]::SystemParametersInfo(0x14, 0, $FilePath, 0x1 -bor 0x2)
+}
+
+<#
+.DESCRIPTION
 Tags: theme cursor mouse pointer
 #>
 function Set-MousePointerImage {
@@ -129,4 +156,5 @@ function Set-MousePointerTheme {
         -Theme $theme `
         -Verbose:$Verbose
 }
+
 
