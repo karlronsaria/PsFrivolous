@@ -82,7 +82,7 @@ function Get-BoxDrawnText {
                 }
 
                 $out += if ($BoxAround) {
-                    "|$line|`n"
+                    "│$line│`n"
                 }
                 else {
                     "$line`n"
