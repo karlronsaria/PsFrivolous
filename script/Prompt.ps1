@@ -26,7 +26,7 @@ function global:Prompt-Frivolous {
 
     $time = Get-Date -Format $setting.TimeFormat
 
-    if ((diff ($time) ($script:TimeCounter))) {
+    if ((Compare-Object ($time) ($script:TimeCounter))) {
         Write-Host (Get-Date -Format $setting.DateTimeFormat) `
             -ForegroundColor $setting.Color.Date
         $script:TimeCounter = $time
