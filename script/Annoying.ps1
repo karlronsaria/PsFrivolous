@@ -456,7 +456,7 @@ function Send-HurryUp {
     return @($timer.Start())
 }
 
-function ForEach-Object {
+filter ForEach-Object {
     [CmdletBinding(
         DefaultParameterSetName = 'ScriptBlockSet',
         SupportsShouldProcess = $true,
@@ -649,10 +649,10 @@ function global:Set-PromptAnnoying {
             if ($info.Reason -like "ParameterBinding*") {
                 Import-Module PsQuickform
 
-                @("Okay, it looks like you need help calling a " +
-                  "commandlet properly") |
-                foreach {
-                    [void] $Voice.SpeakAsync($_)
+                foreach ($msg in @("Okay, it looks like you need help " +
+                    "calling a commandlet properly")
+                ) {
+                    [void] $Voice.SpeakAsync($msg)
                 }
 
                 try {
@@ -669,9 +669,8 @@ function global:Set-PromptAnnoying {
                         Unregister-Event -SourceIdentifier $event.Name
                     }
 
-                    @("Result saved to Q Form Result") |
-                    foreach {
-                        [void] $Voice.SpeakAsync($_)
+                    foreach ($msg in @("Result saved to Q Form Result")) {
+                        [void] $Voice.SpeakAsync($msg)
                     }
                 }
                 catch {
@@ -680,16 +679,14 @@ function global:Set-PromptAnnoying {
                         -Name 'AnnoyingError' `
                         -Value $_
 
-                    @("An error occurred. Result saved to Annoying Error") |
-                    foreach {
-                        [void] $Voice.SpeakAsync($_)
+                    foreach ($msg in @("An error occurred. Result saved to Annoying Error")) {
+                        [void] $Voice.SpeakAsync($msg)
                     }
                 }
             }
             elseif ((Get-Random -Min 1 -Max 20) -eq 1) {
-                @("Oh no", "Our table", "It's broken") |
-                foreach {
-                    [void] $Voice.SpeakAsync($_)
+                foreach ($msg in @("Oh no", "Our table", "It's broken")) {
+                    [void] $Voice.SpeakAsync($msg)
                 }
             }
             else {

@@ -28,7 +28,7 @@
   - actual
     - program hangs indefinitely and takes a long time to force-terminate
 
-- [ ] 2023_11_11_131450
+- [x] 2023_11_11_131450
   - typo: res/fontmap/Poison.json#g
 
 ---

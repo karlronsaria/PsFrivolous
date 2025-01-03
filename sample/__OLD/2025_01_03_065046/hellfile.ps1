@@ -1,8 +1,6 @@
 Set-PsDebug -Strict
 
-& "$PsScriptRoot/Scripts/PsFrivolous/Get-Scripts.ps1" |
-where { (Get-Item $_).BaseName -ne 'Annoying' } |
-foreach { . $_ }
+& "$PsScriptRoot/Scripts/PsFrivolous/Get-Scripts.ps1" | % { . $_ }
 
 # karlr 2023_11_29
 $OutputEncoding =
@@ -50,11 +48,10 @@ $OutputEncoding =
         )
 }.Invoke()
 
-Write-TodoList
-# Get-MySchedule
-
-. "$PsScriptRoot/Scripts/PsFrivolous/script/Annoying.ps1"
-
 Set-PromptAnnoying
 Set-PsReadLineOption -EditMode Vi
+
+# Write-TodoList
+# Get-MySchedule
+
 
