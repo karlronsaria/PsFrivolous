@@ -287,4 +287,56 @@ function Set-MousePointerTheme {
         -Verbose:$Verbose
 }
 
+function Rename-DesktopItem {
+    [CmdletBinding(DefaultParameterSetName = 'ByName')]
+    Param(
+        [Parameter(ParameterSetName = 'ByName')]
+        [String]
+        $ItemName,
+
+        [Parameter(ParameterSetName = 'ByPath')]
+        [String]
+        $Path,
+
+        [ValidateSet('RecycleBin', 'ThisPC')]
+        [Parameter(ParameterSetName = 'Special')]
+        [String]
+        $Special,
+
+        [String]
+        $NewName
+    )
+
+    $shell = New-Object -ComObject Shell.Application
+    $desktop = $shell.NameSpace(0)
+    $items = $desktop.Items()
+
+    $item = switch ($PsCmdlet.ParameterSetName) {
+        'ByName' {
+            $items | where { $_.Name -eq $ItemName }
+        }
+
+        'ByPath' {
+            $items | where { $_.Path -eq $ItemName }
+        }
+
+        'Special' {
+            $path = switch ($Special) {
+                'RecycleBin' { "::{645FF040-5081-101B-9F08-00AA002F954E}" }
+                'ThisPC' { "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}" }
+            }
+
+            $items | where {
+                $_.Path -eq $path
+            }
+        }
+    }
+
+    if ($null -eq $item) {
+        return $false
+    }
+
+    $item.Name = $NewName
+    return $true
+}
 
