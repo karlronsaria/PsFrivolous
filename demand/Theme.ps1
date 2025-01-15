@@ -29,13 +29,14 @@ public class Wallpaper {
 .DESCRIPTION
 Tags: theme shortcut icon overlay
 
-Requires sudo
+Requires elevated permission
 
 .LINK
 Url: <https://www.elevenforum.com/t/remove-shortcut-arrow-icon-in-windows-11.3814/>
 Retrieved: 2025_01_14
 #>
 function Set-ShortcutIconOverlay {
+    #Requires -RunAs
     [CmdletBinding(DefaultParameterSetName = 'NoRestart')]
     Param(
         [Parameter(ParameterSetName = 'NoRestart')]
