@@ -27,6 +27,135 @@ public class Wallpaper {
 
 <#
 .DESCRIPTION
+Tags: theme shortcut icon overlay
+
+Requires sudo
+
+.LINK
+Url: <https://www.elevenforum.com/t/remove-shortcut-arrow-icon-in-windows-11.3814/>
+Retrieved: 2025_01_14
+#>
+function Set-ShortcutIconOverlay {
+    [CmdletBinding(DefaultParameterSetName = 'NoRestart')]
+    Param(
+        [Parameter(ParameterSetName = 'NoRestart')]
+        [Parameter(ParameterSetName = 'Restart')]
+        [Parameter(ValueFromPipeline = $true)]
+        [String]
+        $FilePath,
+
+        [Parameter(ParameterSetName = 'Restart')]
+        [Switch]
+        $RestartExplorer,
+
+        [Parameter(ParameterSetName = 'Restart')]
+        [Switch]
+        $ClearIconCache,
+
+        [Switch]
+        $Force
+    )
+
+    function Start-SystemRefresh {
+        Param(
+            [Switch]
+            $ClearIconCache,
+
+            [Switch]
+            $Force
+        )
+
+        if ($RestartExplorer) {
+            Stop-Process `
+                -Name 'explorer' `
+                -Force:$Force
+
+            $iconCache = "$($env:LocalAppData)\IconCache.db"
+
+            if ($ClearIconCache -and (Test-Path $iconCache)) {
+                Remove-Item `
+                    -Path $iconCache `
+                    -Force:$Force
+            }
+
+            # link: wait for job with timeout
+            # - url: <https://stackoverflow.com/questions/21176487/adding-a-timeout-to-batch-powershell>
+            # - retrieved: 2025_01_14
+
+            $script = {
+                $process = Get-Process `
+                    -Name 'explorer' `
+                    -ErrorAction SilentlyContinue
+
+                while ($null -ne $process) {
+                    $process = Get-Process `
+                        -Name 'explorer' `
+                        -ErrorAction SilentlyContinue
+                }
+            }
+
+            $job = Start-Job -ScriptBlock $script
+
+            if (Wait-Job $job -Timeout 6) {
+                Receive-Job $job
+
+                Start-Process `
+                    -Name 'explorer'
+            }
+
+            Remove-Job $job -Force
+        }
+    }
+
+    $keyPath = 'HKLM:/Software/Microsoft/Windows/CurrentVersion/Explorer/Shell Icons'
+    $keyExists = Test-Path $keyPath
+
+    $key = Get-ItemProperty `
+        -Path $keyPath `
+        -ErrorAction SilentlyContinue
+
+    if (-not $FilePath) {
+        if (-not $keyExists) {
+            return
+        }
+
+        Remove-ItemProperty `
+            -Path $keyPath `
+            -Name '29' `
+            -ErrorAction SilentlyContinue `
+            -Force:$Force
+
+        if ($RestartExplorer) {
+            Start-SystemRefresh `
+                -ClearIconCache:$ClearIconCache `
+                -Force:$Force
+        }
+
+        return
+    }
+
+    if (-not $keyExists) {
+        New-Item `
+            -Path $keyPath `
+            -Force:$Force
+    }
+
+    New-ItemProperty `
+        -Path $keyPath `
+        -Name '29' `
+        -Type String `
+        -Value $FilePath `
+        -Force:$Force
+
+    if ($RestartExplorer) {
+        Start-SystemRefresh `
+            -ClearIconCache:$ClearIconCache `
+            -Force:$Force
+    }
+}
+
+<#
+.DESCRIPTION
 Tags: theme cursor mouse pointer
 #>
 function Set-MousePointerImage {
