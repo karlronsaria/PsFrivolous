@@ -25,6 +25,13 @@
             "Theme": {
                 "Arrow" : "C:/shortcut/dos/backup/theme/toddhoward.cur"
             }
+        },
+        {
+            "Name": "VinnyMode",
+            "Theme": {
+                "Arrow" : "C:/shortcut/dos/backup/theme/vinny-point-left.cur",
+                "Hand"  : "C:/shortcut/dos/backup/theme/vinestank.cur"
+            }
         }
     ]
 }
