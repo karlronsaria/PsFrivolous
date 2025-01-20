@@ -134,6 +134,16 @@ function Set-ShortcutIconOverlay {
 
         return
     }
+    else {
+        if (-not (Test-Path $FilePath)) {
+            "The file path provided could not be found"
+            return
+        }
+
+        # (karlr 2025_01_19): The file path to be added
+        # needs to be a fully-qualified id
+        $FilePath = $(Get-Item $FilePath).FullName
+    }
 
     if (-not $keyExists) {
         New-Item `
