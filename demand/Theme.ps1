@@ -6,7 +6,13 @@ function Set-Wallpaper {
     Param(
         [Parameter(ValueFromPipeline = $true)]
         [String]
-        $FilePath
+        $FilePath,
+
+        [ValidateSet('Centered', 'Stretched', 'Fit', 'Fill')]
+        $Style,
+
+        [Boolean]
+        $Tiled
     )
 
     Add-Type -TypeDefinition @"
@@ -21,6 +27,27 @@ public class Wallpaper {
         -Path 'HKCU:/Control Panel/Desktop' `
         -Name wallpaper `
         -Value $FilePath
+
+    $styleCode = switch ($Style) {
+        'Centered' { 0 }
+        'Stretched' { 2 }
+        'Fit' { 4 }
+        'Fill' { 10 }
+    }
+
+    if ('Style' -in $PsBoundParameters.Keys) {
+        Set-ItemProperty `
+            -Path 'HKCU:/Control Panel/Desktop' `
+            -Name WallpaperStyle `
+            -Value $styleCode
+    }
+
+    if ('Tiled' -in $PsBoundParameters.Keys) {
+        Set-ItemProperty `
+            -Path 'HKCU:/Control Panel/Desktop' `
+            -Name TileWallpaper `
+            -Value:$Tiled
+    }
 
     return 1 -eq [Wallpaper]::SystemParametersInfo(0x14, 0, $FilePath, 0x1 -bor 0x2)
 }
