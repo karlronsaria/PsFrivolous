@@ -1,9 +1,18 @@
 function Get-CurrentMoonPhase {
+    Param(
+        [Switch]
+        $GetLink
+    )
+
     # link
     # - retrieved: 2025_01_15
     $uri = "https://www.timeanddate.com/moon/phases/"
 
-    $response = invoke-webrequest -Uri $uri
+    if ($GetLink) {
+        return $uri
+    }
+
+    $response = Invoke-WebRequest -Uri $uri
 
     if ($null -eq $response) {
         return
