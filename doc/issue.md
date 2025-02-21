@@ -1,6 +1,6 @@
 # Issues
 
-- [ ] 2025_01_06_032209
+- [ ] 2025-01-06-032209
   - howto
     - in PowerShell 5
 
@@ -19,7 +19,7 @@
           + FullyQualifiedErrorId : NamedParameterNotFound,Microsoft.PowerShell.Commands.OutStringCommand
       ```
 
-- [x] 2023_11_11_131922
+- [x] 2023-11-11-131922
   - breaks PsQuickform
   - howto
     - pwsh
@@ -47,7 +47,7 @@
   - actual
     - program hangs indefinitely and takes a long time to force-terminate
 
-- [x] 2023_11_11_131450
+- [x] 2023-11-11-131450
   - typo: res/fontmap/Poison.json#g
 
 ---

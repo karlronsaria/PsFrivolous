@@ -1,4 +1,4 @@
-﻿<#
+<#
 .EXAMPLE
 Get-BoxDrawnText -Message alex, 'you just', dropped, 'it in the fu' | Set-Clipboard
 

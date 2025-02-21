@@ -2,7 +2,7 @@ Set-PsDebug -Strict
 
 & "$PsScriptRoot/Scripts/PsFrivolous/Get-Scripts.ps1" | % { . $_ }
 
-# karlr 2023_11_29
+# karlr 2023-11-29
 $OutputEncoding =
 [System.Console]::InputEncoding =
 [System.Console]::OutputEncoding =

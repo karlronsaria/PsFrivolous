@@ -4,13 +4,13 @@
         "TextColor": "Yellow",
         "NumberColor": "DarkGray",
         "Indent": 3,
-        "DateFormat": "yyyy_MM_dd",
+        "DateFormat": "yyyy-MM-dd",
         "MarkdownBranchPattern": "^\\s*(\\d+\\.|-) "
     },
     "Prompt": {
         "ApplicationName": "PS",
         "TimeFormat": "HHmm",
-        "DateTimeFormat": "yyyy_MM_dd [HH:mm:ss]",
+        "DateTimeFormat": "yyyy-MM-dd [HH:mm:ss]",
         "Color": {
             "Application": "White",
             "Date": "DarkGreen",

@@ -5,7 +5,7 @@ function Get-CurrentMoonPhase {
     )
 
     # link
-    # - retrieved: 2025_01_15
+    # - retrieved: 2025-01-15
     $uri = "https://www.timeanddate.com/moon/phases/"
 
     if ($GetLink) {

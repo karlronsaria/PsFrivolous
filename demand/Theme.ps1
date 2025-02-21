@@ -60,7 +60,7 @@ Requires elevated permission
 
 .LINK
 Url: <https://www.elevenforum.com/t/remove-shortcut-arrow-icon-in-windows-11.3814/>
-Retrieved: 2025_01_14
+Retrieved: 2025-01-14
 #>
 function Set-ShortcutIconOverlay {
     #Requires -RunAs
@@ -108,7 +108,7 @@ function Set-ShortcutIconOverlay {
 
             # link: wait for job with timeout
             # - url: <https://stackoverflow.com/questions/21176487/adding-a-timeout-to-batch-powershell>
-            # - retrieved: 2025_01_14
+            # - retrieved: 2025-01-14
 
             $script = {
                 $process = Get-Process `
@@ -167,7 +167,7 @@ function Set-ShortcutIconOverlay {
             return
         }
 
-        # (karlr 2025_01_19): The file path to be added
+        # (karlr 2025-01-19): The file path to be added
         # needs to be a fully-qualified id
         $FilePath = $(Get-Item $FilePath).FullName
     }
@@ -210,7 +210,7 @@ function Set-MousePointerImage {
           - <https://superuser.com/questions/1769195/how-to-change-mouse-cursor-using-powershell-script-on-windows-11-without-restart>
           - <https://superuser.com/users/8672/harrymc>
           - <https://devblogs.microsoft.com/scripting/use-powershell-to-change-the-mouse-pointer-scheme/>
-        - retrieved: 2024_09_24
+        - retrieved: 2024-09-24
         #>
         $cSharpSig =
 @'

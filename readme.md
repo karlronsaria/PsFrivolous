@@ -11,7 +11,7 @@
 - natemrice/powershell-drawing
   - used in: [``Draw.ps1#Write-Bitmap``](./doc/Draw.md)
   - url: <https://github.com/natemrice/powershell-drawing>
-  - retrieved: 2023_11_18
+  - retrieved: 2023-11-18
 
 ### Sounds
 
@@ -20,7 +20,7 @@
     - title: Battle sfx [fire ball]
     - uploader: GAS
   - url: <https://www.youtube.com/watch?v=7h2dRFBfHvo>
-  - retrieved: 2023_10_08
+  - retrieved: 2023-10-08
 - oh-no-our-table.wav
   - various
   - search: oh no our table
@@ -38,13 +38,13 @@
     - title: Shotgun Sound Effects
     - uploader: SoundMaster
   - url: <https://www.youtube.com/watch?v=AGVz9zoWNrQ>
-  - retrieved: 2023_10_18
+  - retrieved: 2023-10-18
 - burning-intro.wav
   - YouTube
     - title: Burning Fire with sound effects free to use | no copyright
     - uploader: Abdullah Nazim
   - url: <https://www.youtube.com/watch?v=GdwhlKKw0Lc>
-  - retrieved: 2023_10_18
+  - retrieved: 2023-10-18
 - hurry-up.wav
   - Pokémon Pinball (1999) – Map Mode
 - look-bubbles

@@ -1,7 +1,7 @@
 <#
 .LINK
 Url: <https://www.kenmuse.com/blog/coloring-in-ansi/>
-Retrieved: 2023_11_21
+Retrieved: 2023-11-21
 #>
 function Write-Color {
     [CmdletBinding(DefaultParameterSetName = "ByPixel")]
@@ -76,11 +76,11 @@ Take any image and render it to the PowerShell command line, pixel by pixel.
 Most command lines are 120 columns by default, so you want a picture that's smaller than that.
 
 Author: naterice.com
-Date: 2019_03_12
+Date: 2019-03-12
 
 .LINK
 Url: <https://naterice.com>
-Retrieved: 2019_03_12
+Retrieved: 2019-03-12
 
 .EXAMPLE
 Write-Bitmap .\picture.png

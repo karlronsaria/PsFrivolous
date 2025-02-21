@@ -23,16 +23,20 @@
         {
             "Name": "ToddMode",
             "Theme": {
-                "Arrow" : "C:/shortcut/dos/backup/theme/toddhoward.cur",
-                "Hand"  : "C:/shortcut/dos/backup/theme/toddhoward-point.cur",
-                "IBEAM" : "C:/shortcut/dos/backup/theme/toddhoward-point-02.cur"
+                "Arrow"        : "C:/shortcut/dos/backup/theme/toddhoward.cur",
+                "Hand"         : "C:/shortcut/dos/backup/theme/toddhoward-point.cur",
+                "IBEAM"        : "C:/shortcut/dos/backup/theme/toddhoward-point-02.cur",
+                "AppStarting"  : "C:/shortcut/dos/backup/theme/arnie.ani",
+                "Wait"         : "C:/shortcut/dos/backup/theme/arnie.ani"
             }
         },
         {
             "Name": "VinnyMode",
             "Theme": {
-                "Arrow" : "C:/shortcut/dos/backup/theme/vinny-point-left.cur",
-                "Hand"  : "C:/shortcut/dos/backup/theme/vinestank.cur"
+                "Arrow"        : "C:/shortcut/dos/backup/theme/vinny-point-left.cur",
+                "Hand"         : "C:/shortcut/dos/backup/theme/vinestank.cur",
+                "AppStarting"  : "C:/shortcut/dos/backup/theme/arnie.ani",
+                "Wait"         : "C:/shortcut/dos/backup/theme/arnie.ani"
             }
         }
     ]
