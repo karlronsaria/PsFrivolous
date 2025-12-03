@@ -15,7 +15,7 @@
                 "SizeWE"       : "C:/Windows/Cursors/size_we.cur",
                 "SizeNWSE"     : "C:/Windows/Cursors/size_nwse.cur",
                 "SizeNESW"     : "C:/Windows/Cursors/size_nesw.cur",
-                "SizeAll"      : "C:/Windows/Cursors/size_all.cur",
+                "SizeAll"      : "C:/Windows/Cursors/lmove.cur",
                 "UpArrow"      : "C:/Windows/Cursors/up_i.cur",
                 "Hand"         : "C:/Windows/Cursors/aero_link.cur"
             }
@@ -26,18 +26,29 @@
                 "Arrow"        : "C:/shortcut/dos/backup/theme/toddhoward.cur",
                 "Hand"         : "C:/shortcut/dos/backup/theme/toddhoward-point.cur",
                 "IBEAM"        : "C:/shortcut/dos/backup/theme/toddhoward-point-02.cur",
-                "AppStarting"  : "C:/shortcut/dos/backup/theme/arnie.ani",
-                "Wait"         : "C:/shortcut/dos/backup/theme/arnie.ani"
+                "AppStarting"  : "C:/shortcut/dos/backup/theme/barry-dance.ani",
+                "Wait"         : "C:/shortcut/dos/backup/theme/barry-dance.ani",
+                "SizeAll"      : "C:/shortcut/dos/backup/theme/tobey-thrust.ani"
             }
         },
         {
             "Name": "ToddMode2",
             "Theme": {
-                "Arrow"        : "C:/shortcut/dos/backup/theme/toddhoward.cur",
+                "Arrow"        : "C:/shortcut/dos/backup/theme/hairy-steve.ani",
                 "Hand"         : "C:/shortcut/dos/backup/theme/toddhoward-point.cur",
                 "IBEAM"        : "C:/shortcut/dos/backup/theme/toddhoward-fish-hand.cur",
-                "AppStarting"  : "C:/shortcut/dos/backup/theme/arnie.ani",
-                "Wait"         : "C:/shortcut/dos/backup/theme/arnie.ani"
+                "AppStarting"  : "C:/shortcut/dos/backup/theme/hairy-steve.ani",
+                "Wait"         : "C:/shortcut/dos/backup/theme/hairy-steve.ani"
+            }
+        },
+        {
+            "Name": "BarryMode",
+            "Theme": {
+                "Arrow"        : "C:/shortcut/dos/backup/theme/barry-stance.cur",
+                "Hand"         : "C:/shortcut/dos/backup/theme/barry-point-left.cur",
+                "IBEAM"        : "C:/shortcut/dos/backup/theme/barry-point-left.cur",
+                "AppStarting"  : "C:/shortcut/dos/backup/theme/barry-dance.ani",
+                "Wait"         : "C:/shortcut/dos/backup/theme/barry-dance.ani"
             }
         },
         {
@@ -45,8 +56,19 @@
             "Theme": {
                 "Arrow"        : "C:/shortcut/dos/backup/theme/vinny-point-left.cur",
                 "Hand"         : "C:/shortcut/dos/backup/theme/vinestank.cur",
-                "AppStarting"  : "C:/shortcut/dos/backup/theme/arnie.ani",
-                "Wait"         : "C:/shortcut/dos/backup/theme/arnie.ani"
+                "AppStarting"  : "C:/shortcut/dos/backup/theme/vinny-smile.ani",
+                "Wait"         : "C:/shortcut/dos/backup/theme/vinny-smile.ani"
+            }
+        },
+        {
+            "Name": "TestMode",
+            "Theme": {
+                "Arrow"        : "C:/shortcut/dos/backup/theme/baker.ani",
+                "Hand"         : "C:/shortcut/dos/backup/theme/toddhoward-point.cur",
+                "IBEAM"        : "C:/shortcut/dos/backup/theme/toddhoward-point-02.cur",
+                "AppStarting"  : "C:/shortcut/dos/backup/theme/hairy-steve.ani",
+                "Wait"         : "C:/shortcut/dos/backup/theme/arnie.ani",
+                "SizeAll"      : "C:/shortcut/dos/backup/theme/tobey-thrust.ani"
             }
         }
     ]
