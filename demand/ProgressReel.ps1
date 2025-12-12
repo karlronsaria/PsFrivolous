@@ -41,7 +41,43 @@ function Write-Progress {
         ${Completed},
 
         [int]
-        ${SourceId}
+        ${SourceId},
+
+        [ArgumentCompleter({
+            Param($A, $B, $C)
+
+            $reels = Get-ChildItem "$($env:USERPROFILE)/Videos/reel/*" -Directory |
+                foreach { $_.Name }
+
+            $suggest = $reels | where { "$C*" -like $_ }
+            
+            return $(if ($suggest) {
+                $suggest
+            }
+            else {
+                $reels
+            }) |
+            foreach {
+                if ($_ -like "* *") {
+                    "`"$_`""
+                }
+                else {
+                    $_
+                }
+            }
+        })]
+        [ValidateScript({
+            if (-not $_) {
+                return $true
+            }
+
+            $reels = Get-ChildItem "$($env:USERPROFILE)/Videos/reel/*" -Directory |
+                foreach { $_.Name }
+                
+            return $_ -in $reels
+        })]
+        [string]
+        ${Reel}
     )
 
     begin
@@ -52,8 +88,15 @@ function Write-Progress {
             {
                 $PSBoundParameters['OutBuffer'] = 1
             }
-
-            if (-not $global:progressReel) {
+            
+            if ($Reel) {
+                $global:progressReel = Get-ChildItem "$($env:USERPROFILE)/Videos/reel/$Reel" |
+                    where Name -eq 'img' |
+                    Get-ChildItem -File
+                    
+                $PSBoundParameters.Remove('Reel')
+            }
+            elseif (-not $global:progressReel) {
                 $global:progressReel = Get-ChildItem "$($env:USERPROFILE)/Videos/reel/*" -Directory |
                     Get-Random |
                     Get-ChildItem |
@@ -62,7 +105,7 @@ function Write-Progress {
             }
 
             $wrappedCmd = $ExecutionContext.InvokeCommand.GetCommand('Microsoft.PowerShell.Utility\Write-Progress', [System.Management.Automation.CommandTypes]::Cmdlet)
-            $scriptCmd = {& $wrappedCmd @PSBoundParameters }
+            $scriptCmd = { & $wrappedCmd @PSBoundParameters }
 
             $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
             $steppablePipeline.Begin($PSCmdlet)
