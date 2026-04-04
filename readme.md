@@ -15,6 +15,12 @@
 
 ### Sounds
 
+- vinny-001–023.wav
+  - YouTube
+    - title: 2 hours of silence occasionally broken by Vinny Vinesauce saying 'hey im walking here'
+    - uploader: "Vinesauce: The Full Sauce"
+  - url: <https://www.youtube.com/watch?v=7BHNw-cDbv0>
+  - retrieved: 2026-04-04
 - fireball.wav
   - YouTube
     - title: Battle sfx [fire ball]

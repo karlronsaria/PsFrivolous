@@ -1,4 +1,4 @@
-function Get-CurrentMoonPhase {
+function Get-MoonPhase {
     Param(
         [Switch]
         $GetLink
