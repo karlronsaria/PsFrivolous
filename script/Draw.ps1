@@ -6,65 +6,84 @@ Retrieved: 2023-11-21
 function Write-Color {
     [CmdletBinding(DefaultParameterSetName = "ByPixel")]
     Param(
-        [Parameter(Position = 0)]
-        [String]
-        $InputObject = " ",
+        [Parameter(ParameterSetName = "ByTriple")]
+        [Parameter(ValueFromPipeline = $true)]
+        [string[]]
+        $InputObject,
 
         [Parameter(ParameterSetName = "ByPixel")]
         [System.Drawing.Color]
         $Pixel,
 
-        [Parameter(ParameterSetName = "ByQuadruple")]
+        [Parameter(ParameterSetName = "ByTriple")]
+        [ValidateRange(0, 255)]
+        [ValidateCount(3, 3)]
+        [ArgumentCompleter({
+            [OutputType([System.Management.Automation.CompletionResult])]
+            Param($A, $B, $C)
+
+            $CompletionResults =
+                [System.Collections.Generic.List[System.Management.Automation.CompletionResult]]::new()
+
+            1 .. 16 |
+            ForEach-Object {
+                16 * $_ - 1
+            } |
+            Where-Object {
+                "$_" -like "$C*"
+            } |
+            ForEach-Object {
+                $CompletionResults.Add($_)
+            }
+
+            return $CompletionResults
+        })]
+        [int[]]
+        $Foreground,
+
+        [Parameter(ParameterSetName = "ByTriple")]
+        [ValidateRange(0, 255)]
+        [ValidateCount(3, 3)]
+        [ArgumentCompleter({
+            [OutputType([System.Management.Automation.CompletionResult])]
+            Param($A, $B, $C)
+
+            $CompletionResults =
+                [System.Collections.Generic.List[System.Management.Automation.CompletionResult]]::new()
+
+            1 .. 16 |
+            ForEach-Object {
+                16 * $_ - 1
+            } |
+            Where-Object {
+                "$_" -like "$C*"
+            } |
+            ForEach-Object {
+                $CompletionResults.Add($_)
+            }
+
+            return $CompletionResults
+        })]
+        [int[]]
+        $Background,
+
         [Int]
-        $Red,
-
-        [Parameter(ParameterSetName = "ByQuadruple")]
-        [Int]
-        $Green,
-
-        [Parameter(ParameterSetName = "ByQuadruple")]
-        [Int]
-        $Blue,
-
-        [Parameter(ParameterSetName = "ByQuadruple")]
-        [Int]
-        $Alpha = 255,
-
-        [Int]
-        $XScale = 1,
-
-        [ValidateSet("Foreground", "Background")]
-        [String]
-        $ApplyTo = "Background",
-
-        [Switch]
-        $NoAlpha
+        $XScale = 1
     )
 
-    if ($PsCmdlet.ParameterSetName -eq "ByPixel") {
-        $Alpha = $Pixel.A
-        $Red = $Pixel.R
-        $Green = $Pixel.G
-        $Blue = $Pixel.B
+    Process {
+        if ($PsCmdlet.ParameterSetName -eq "ByPixel") {
+            $Background = $Pixel.R, $Pixel.G, $Pixel.B
+            $out = "$([char]27)[48;2;$($Background -join ';')m $([char]27)[0m"
+            $out * $XScale
+        }
+        else {
+            foreach ($item in @($InputObject)) {
+                $out = "$([char]27)[48;2;$($Background -join ';')m$([char]27)[38;2;$($Foreground -join ';')m$item$([char]27)[0m"
+                $out * $XScale
+            }
+        }
     }
-
-    $ansi_escape = [char]27
-    $alpha_str = if (-not $NoAlpha) { ";{3}" }
-
-    $mode_num = switch ($ApplyTo) {
-        "Foreground" { 38 }
-        "Background" { 48 }
-    }
-
-    $ansi_command = "$ansi_escape[$mode_num;2;{0};{1};{2}$($alpha_str)m" -f
-        $Red,
-        $Green,
-        $Blue,
-        $Alpha
-
-    $ansi_terminate = "$ansi_escape[0m"
-    $out = "$($ansi_command)$($InputObject)$($ansi_terminate)"
-    $out * $XScale
 }
 
 <#
@@ -113,10 +132,7 @@ function Write-Bitmap {
         $Url,
 
         [Int]
-        $XScale = 1,
-
-        [Switch]
-        $NoAlpha
+        $XScale = 1
     )
 
     [void][System.Reflection.Assembly]::
@@ -141,7 +157,7 @@ function Write-Bitmap {
             )
         }
     }
-
+    
     $x_range = (0 .. ($bitMap.Width - 1))
 
     if ($XScale -lt 0) {
@@ -153,12 +169,18 @@ function Write-Bitmap {
         $line = New-Object System.Text.StringBuilder
 
         foreach ($x in $x_range) {
-            [void] $line.Append($(
+            $pixel = $bitmap.GetPixel($x, $y)
+            
+            $char = if ($pixel.A -eq 0) {
+                ' ' * $XScale
+            }
+            else {
                 Write-Color `
                     -Pixel $bitMap.GetPixel($x, $y) `
-                    -XScale $XScale `
-                    -NoAlpha:$NoAlpha
-            ))
+                    -XScale $XScale
+            }
+
+            [void] $line.Append($char)
         }
 
         $line.ToString()
@@ -184,13 +206,13 @@ function Write-ColorWheel {
         [Int]
         $Period = 64,
 
-        [ValidateSet("Foreground", "Background")]
-        [String]
-        $ApplyTo = "Foreground",
-
         [ValidateSet("ByCharacter", "ByPeriod", "ByColumn")]
         [String]
         $Mode = "ByColumn",
+
+        [ValidateSet("Foreground", "Background")]
+        [String]
+        $ApplyTo = "Foreground",
 
         [Int]
         $Start = 0,
@@ -230,13 +252,14 @@ function Write-ColorWheel {
             "ByColumn" {
                 ($list |
                     Out-String -NoNewline:$NoNewline
-                ) -Split "`n" | foreach {
+                ) -Split "`n" |
+                ForEach-Object {
                     Write-ColorWheel `
                         -InputObject $_ `
                         -Period $Period `
-                        -ApplyTo $ApplyTo `
                         -Mode "ByPeriod" `
-                        -Start $Start
+                        -Start $Start `
+                        -ApplyTo $ApplyTo
                 }
             }
 
@@ -245,18 +268,19 @@ function Write-ColorWheel {
                 GetTextElementEnumerator((
                     $list | Out-String -NoNewline:$NoNewline
                 )) |
-                foreach -Begin {
+                ForEach-Object -Begin {
                     $i = $Start
                     $line = New-Object System.Text.StringBuilder
                 } -Process {
-                    $isSpace = [String]::IsNullOrWhiteSpace($_)
+                    $str = $_
+                    $isSpace = [String]::IsNullOrWhiteSpace($str)
 
                     [void] $line.Append($(
-                        if ($_ -match "^\s*(`r|`n)$") {
+                        if ($str -match "^\s*(`r|`n)$") {
                             ""
                         }
                         elseif ($isSpace) {
-                            $_
+                            $str
                         }
                         else {
                             # Red, Green, and Blue must be equidistant
@@ -266,13 +290,19 @@ function Write-ColorWheel {
                             $g = Get-Signal -Arg $i -Offset (2.0/3)
                             $b = Get-Signal -Arg $i -Offset (4.0/3)
 
-                            Write-Color `
-                                -InputObject $_ `
-                                -Red $r `
-                                -Green $g `
-                                -Blue $b `
-                                -ApplyTo $ApplyTo `
-                                -NoAlpha
+                            switch ($ApplyTo) {
+                                'Foreground' {
+                                    Write-Color `
+                                        -InputObject $str `
+                                        -Foreground $r, $g, $b
+                                }
+
+                                'Background' {
+                                    Write-Color `
+                                        -InputObject $str `
+                                        -Background $r, $g, $b
+                                }
+                            }
                         }
                     ))
 
